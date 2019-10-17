@@ -13,6 +13,7 @@ from selenium.webdriver import DesiredCapabilities
 #跳过SSL验证证书
 import ssl
 #设置忽略SSL验证
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.proxy import ProxyType
 
 from config import phantomjs_driver, generate_cookie_url, chrome_driver, generate_cookie_url, cookie_max_num, \
@@ -108,14 +109,20 @@ def generateCookie():
             desired_capabilities["phantomjs.page.settings.loadImages"] = False
 
             # 创建一个参数对象,用来控制chrome以无界面打开
-            # driver = webdriver.ChromeOptions()
-            # driver.add_argument('--headless')  # 开启无界面模式
-            # driver.add_argument('--disable-gpu')  # 禁用gpu，解决一些莫名的问题
+            # chrome_options = Options()
+            # chrome_options = webdriver.ChromeOptions()
+            # chrome_options.add_argument('--user-agent='+random.choice(user_agent))
+            # chrome_options.add_argument('--headless')  # 开启无界面模式
+            # chrome_options.add_argument('--disable-gpu')  # 禁用gpu，解决一些莫名的问题
+            # chrome_options.add_argument('--no-sandbox')
+            # driver = webdriver.Chrome(executable_path=chrome_driver,chrome_options=chrome_options)    # 此方法总是超时
             # driver = webdriver.Chrome(executable_path=chrome_driver)
             # driver.maximize_window()
+            # driver.minimize_window()
 
             # PhantomJS创建无界面的浏览器对象
-            driver = webdriver.PhantomJS(executable_path=phantomjs_driver)
+            driver = webdriver.PhantomJS(executable_path=phantomjs_driver,
+                                         service_log_path=r'./phantomjs-2.1.1-windows/ghostdriver.log')
             driver.start_session(desired_capabilities)
             # 隐式等待5秒，可以自己调节
             driver.implicitly_wait(5)
@@ -320,6 +327,6 @@ def getCookie2():
 if __name__ == '__main__':
     # getCookie()
     # getCookie2()
-    for i in range(100):
-        generateCookie()
+    # for i in range(100):
+    generateCookie()
     # generateProxyCookie(_proxy())
