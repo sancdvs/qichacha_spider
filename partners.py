@@ -26,7 +26,11 @@ def export_partners(data_list,workbook):
     for _response in data_list:
         j += 1
         # 公司名称
-        company_name = re.findall('<div class="company-name">(.*?\s*)<', _response)[0].strip()
+        company_name = re.findall('<div class="company-name">(.*?\s*)<', _response)
+        if len(company_name) > 0:
+            company_name = company_name[0].strip()
+        else:
+            company_name = '--'
         print('公司名称：' + company_name)
         # print(_response)
         list = re.findall('<div class="stock-item">(.*?\s*\n*.*?\s*\n*.*?\s*\n*)</div>\n?\s*</div>\n?\s*</div>\n?\s*</div>', _response)
@@ -50,32 +54,40 @@ def export_partners(data_list,workbook):
             partner_list = re.findall('<div class="stock-text">(.*?\s*)<', partner)
 
             #股东名称
-            partner_name = re.findall(' <div class="stock-title"> <span > <a class="text-blue a-decoration"( href=".*?")? >(.*?\s*)</a>', partner)[0][1].strip()
+            partner_name = re.findall(' <div class="stock-title"> <span > <a class="text-blue a-decoration"( href=".*?")? >(.*?\s*)</a>', partner)
+            if len(partner_name) > 0:
+                partner_name = partner_name[0][1].strip()
+            else:
+                partner_name = '--'
             print('股东名称：' + partner_name)
             worksheet.write(i, 2, partner_name,style)  # 将信息输入表格
-
-            #持股比例
-            stock_rate = partner_list[0].strip()
+            if len(partner_list) > 0:
+                #持股比例
+                stock_rate = partner_list[0].strip()
+            else:
+                stock_rate = '--'
             print('持股比例：' + stock_rate)
             worksheet.write(i, 3, stock_rate,style)  # 将信息输入表格
-
-            #股东类型
-            stock_type = partner_list[1].strip()
+            if len(partner_list) > 1:
+                #股东类型
+                stock_type = partner_list[1].strip()
+            else:
+                stock_type = '--'
             print('股东类型：' + stock_type)
             worksheet.write(i, 4, stock_type,style)  # 将信息输入表格
-
-            #认缴出资额(万元)
-            money = partner_list[2].strip()
+            if len(partner_list) > 2:
+                #认缴出资额(万元)
+                money = partner_list[2].strip()
+            else:
+                money = '--'
             print('认缴出资额(万元)：' + money)
             worksheet.write(i, 5, money,style)  # 将信息输入表格
-
             if len(partner_list) > 3:
                 #认缴出资日期
                 time = partner_list[3].strip()
-                print('认缴出资日期：' + time)
             else:
                 time = '--'
-                print('认缴出资日期：' + time)
+            print('认缴出资日期：' + time)
             worksheet.write(i, 6, time,style)  # 将信息输入表格
         print('----------------------------------------------------------------------')
     return worksheet

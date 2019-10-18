@@ -20,7 +20,11 @@ def export_key_personnel(data_list, workbook):
     for _response in data_list:
         j += 1
         # 公司名称
-        company_name = re.findall('<div class="company-name">(.*?\s*)<', _response)[0].strip()
+        company_name = re.findall('<div class="company-name">(.*?\s*)<', _response)
+        if len(company_name) > 0:
+            company_name = company_name[0].strip()
+        else:
+            company_name = '--'
         print('公司名称：' + company_name)
         personnel_list = re.findall('<a class="employee-item" href=".*?" style="display: block;">(\s*.*?\s*)</a>', _response)
         # print(personnel_list)
@@ -37,11 +41,19 @@ def export_key_personnel(data_list, workbook):
         for personnel in personnel_list:
             i += 1
             # 姓名
-            name = re.findall('<div class="employee-name">(\s*.*?\s*)</div>', personnel)[0].strip()
+            name = re.findall('<div class="employee-name">(\s*.*?\s*)</div>', personnel)
+            if len(name) > 0:
+                name = name[0].strip()
+            else:
+                name = '--'
             print('姓名：' + name)
             worksheet.write(i, 2, name, style)  # 将信息输入表格
             # 职务
-            job = re.findall('<div class="employee-job">(\s*.*?\s*)</div>', personnel)[0].strip()
+            job = re.findall('<div class="employee-job">(\s*.*?\s*)</div>', personnel)
+            if len(job) > 0:
+                job = job[0].strip()
+            else:
+                job = '--'
             print('职务：' + job)
             worksheet.write(i, 3, job, style)  # 将信息输入表格
         print('----------------------------------------------------------------------')

@@ -1,4 +1,6 @@
 # from fake_useragent import UserAgent
+import inspect
+import os
 import re
 import random
 import time
@@ -17,12 +19,12 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.proxy import ProxyType
 
 from config import phantomjs_driver, generate_cookie_url, chrome_driver, generate_cookie_url, cookie_max_num, \
-    cookie_timeout, cookie_retry_num
+    cookie_timeout, cookie_retry_num, cookie_interval_time, log_dir
 from proxy_ip import _proxy
 
 ssl._create_default_https_context = ssl._create_unverified_context
 # ua = UserAgent()
-
+is_clear = False
 
 # 请求头设置
 user_agent = [
@@ -79,7 +81,7 @@ def get_headers():
         # 'Accept-Encoding': 'gzip, deflate, br',
         # 'Accept-Language': 'zh-CN,zh;q=0.9',
         'User-Agent': random.choice(user_agent),
-        'cookie': generateCookie()
+        'cookie': getGenerateCookie()
     }
 
 
@@ -95,13 +97,30 @@ def get_proxy_headers(proxy_ip):
         'cookie': generateProxyCookie(proxy_ip)
     }
 
+
+# 获取cookie
+def getGenerateCookie():
+    cookie = None
+    while True:
+        if not is_clear and len(cookies_local) > 0:
+            cookie = random.choice(cookies_local)
+            break
+        # elif is_clear:
+            # print('is clearing...')
+    return cookie
+
+
 # 生成cookie
 def generateCookie():
-    cookie = None
     if len(cookies_local) == cookie_max_num:
-        cookie = random.choice(cookies_local)
-    else:
-        for i in range(cookie_retry_num):
+        # 在函数内部修改全局变量的值，要先用global声明全局变量。
+        # print('to clear...')
+        global is_clear
+        is_clear = True
+        cookies_local.clear()
+
+    for i in range(cookie_max_num):
+        for j in range(cookie_retry_num):
             desired_capabilities = DesiredCapabilities.PHANTOMJS.copy()
             # 从USER_AGENTS列表中随机选一个浏览器头，伪装浏览器
             desired_capabilities["phantomjs.page.settings.userAgent"] = (random.choice(user_agent))
@@ -121,8 +140,14 @@ def generateCookie():
             # driver.minimize_window()
 
             # PhantomJS创建无界面的浏览器对象
-            driver = webdriver.PhantomJS(executable_path=phantomjs_driver,
-                                         service_log_path=r'./phantomjs-2.1.1-windows/ghostdriver.log')
+            # 获取当前文件路径
+            current_path = inspect.getfile(inspect.currentframe())
+            # 获取当前文件所在目录，相当于当前文件的父目录
+            dir_name = os.path.dirname(current_path)
+            # 转换为绝对路径
+            file_abs_path = os.path.abspath(dir_name)
+            driver = webdriver.PhantomJS(executable_path=file_abs_path+phantomjs_driver,
+                                         service_log_path=file_abs_path+log_dir+r'\ghostdriver.log')
             driver.start_session(desired_capabilities)
             # 隐式等待5秒，可以自己调节
             driver.implicitly_wait(5)
@@ -146,7 +171,10 @@ def generateCookie():
                 for cookiee in cookie_list:
                     cookie_lst.append('{}={}'.format(cookiee['name'], cookiee['value']))
                 cookie = "; ".join(cookie_lst)
+                # print('cookie=============={}'.format(cookie))
                 cookies_local.append(cookie)
+                if is_clear:
+                    is_clear = False
                 break
             except NoSuchElementException as e:
                 print('==============没有找到元素==============')
@@ -154,18 +182,16 @@ def generateCookie():
             except TimeoutException as e:
                 print('==============生成cookie超时============')
                 print(str(e))
-                print('请求超时{}次，正在重新生成cookie......'.format(i+1))
+                print('请求超时{}次，正在重新生成cookie......'.format(j+1))
             except Exception as e:
                 print('==============生成cookie异常============')
                 print(str(e))
-                print('请求异常{}次，正在重新生成cookie......'.format(i+1))
+                print('请求异常{}次，正在重新生成cookie......'.format(j+1))
             finally:
                 driver.close()
                 driver.quit()   # phantomJS进程需要关闭，不然在内存中驻留的phantomJS进程越来越多，最终吃光内存。
-                # cookie = random.choice(cookies_local)
             time.sleep(random.randint(3, 10))  # 每隔3到10秒
-    # print('cookie=============={}'.format(cookie))
-    return cookie
+    # print('cookie=============={}'.format(cookies_local))
 
 
 # 使用代理生成cookie
@@ -327,6 +353,10 @@ def getCookie2():
 if __name__ == '__main__':
     # getCookie()
     # getCookie2()
-    # for i in range(100):
-    generateCookie()
+    for i in range(100):
+        generateCookie()
     # generateProxyCookie(_proxy())
+    # print('等待一分钟...')
+    # time.sleep(60)
+    # interval_time = time.time() - start_time
+    # print(interval_time//60)

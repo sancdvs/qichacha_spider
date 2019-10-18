@@ -8,18 +8,25 @@ from importlib import reload
 
 from lxml import etree
 from selenium import webdriver
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver import ActionChains
-# from chaojiying import Chaojiying_Client
 from openpyxl import load_workbook
 import sys
 
-reload(sys)
-exec("sys.setdefaultencoding('utf-8')")
+# reload(sys)
+# exec("sys.setdefaultencoding('utf-8')")
 
-driver = webdriver.ChromeOptions()
-driver.add_argument('--headless')  # 开启无界面模式
-driver.add_argument('--disable-gpu')  # 禁用gpu，解决一些莫名的问题
-driver = webdriver.Chrome()
+from config import chrome_driver
+from headers import user_agent
+from tools.chaojiying import Chaojiying_Client
+
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument('--user-agent='+random.choice(user_agent))
+# chrome_options.add_argument('--headless')  # 开启无界面模式
+# chrome_options.add_argument('--disable-gpu')  # 禁用gpu，解决一些莫名的问题
+# chrome_options.add_argument('--no-sandbox')
+driver = webdriver.Chrome(executable_path=chrome_driver,chrome_options=chrome_options)
+# driver = webdriver.Chrome(executable_path=chrome_driver)
 driver.maximize_window()
 
 
@@ -31,14 +38,65 @@ def save():
     f.write(data)
 
 
-# def chaoji():
-#     chaojiying = Chaojiying_Client('账号', '密码', '899210')  # 用户中心>>软件ID 生成一个替换 96001
-#     im = open('a.jpg', 'rb').read()  # 本地图片文件路径 来替换 a.jpg 有时WIN系统须要//
-#     datas = chaojiying.PostPic(im, 1902)  # 1902 验证码类型  官方网站>>价格体系 3.4+版 print 后要加()
-#     ocr = datas['pic_str']
-#     # print datas
-#     print(ocr)
-#     return ocr
+def chaoji():
+    chaojiying = Chaojiying_Client('sunlu123', 'sl123456', '901903')  # 用户中心>>软件ID 生成一个替换 96001
+    im = open('a.jpg', 'rb').read()  # 本地图片文件路径 来替换 a.jpg 有时WIN系统须要//
+    datas = chaojiying.PostPic(im, 1902)  # 1902 验证码类型  官方网站>>价格体系 3.4+版 print 后要加()
+    ocr = datas['pic_str']
+    # print datas
+    print(ocr)
+    return ocr
+
+
+# 用于提供模拟匀加速运动的轨迹
+def get_track(distance):
+    track = []
+    current = 0
+    mid = distance * 3 / 5
+    t = 0.2
+    v = 0
+    while current < distance:
+        if current < mid:
+            a = 3
+        else:
+            a = 6
+        v0 = v
+        v = v0 + a * t
+        move = v0 * t + 1 / 2 * a * t * t
+        current += move
+        track.append(round(move))
+    print(track)
+    return track
+
+
+# 滑动验证码识别
+def slide_discern():
+    print("滑块验证码验证中。。。")
+    # try:
+    # 获取到需滑动的按钮
+    source = driver.find_element_by_xpath('//*[@id="nc_1_n1z"]')
+    action = ActionChains(driver)
+    # 按住左键不放
+    action.click_and_hold(source).perform()
+    # 开始滑动
+    distance = 348  # 模拟以人为速度拖动
+    track = get_track(distance)
+    # ttt = [23, 81, 224]
+    for i in track:
+        try:
+            action.move_by_offset(xoffset=i, yoffset=0).perform()   # perform --- 执行所有准备好的Action
+            # action.reset_actions()  # reset_actions --- 清空所有准备好的Action,这个需要selenium版本3.0以上
+            # time.sleep(0.4)
+        except StaleElementReferenceException as e:
+            action.release().perform()  # 释放鼠标
+            driver.find_element_by_xpath('//div[@class="errloading"]/span/a').click()
+            source = driver.find_element_by_xpath('//*[@id="nc_1_n1z"]')    # 获取到需滑动的按钮
+            action = ActionChains(driver)
+            action.click_and_hold(source).perform() # 按住左键不放
+            # action.reset_actions()  # 清除之前的action
+            action.move_by_offset(xoffset=i, yoffset=0).perform()  # perform --- 执行所有准备好的Action
+    # 释放鼠标
+    action.release().perform()
 
 
 def login_web():
@@ -50,22 +108,25 @@ def login_web():
     driver.find_element_by_xpath('//div[@class="login-panel-head clearfix"]/div[2]').click()
     time.sleep(1)
     # 找到账号输入框
-    driver.find_element_by_xpath('//div[@class="form-group"]/input[@id="nameNormal"]').send_keys('')
-    # 找到密码输入框
-    driver.find_element_by_xpath('//div[@class="form-group m-t-md"]/input[@id="pwdNormal"]').send_keys('')
-    # 滑动条定位
-    start = driver.find_element_by_xpath('//div[@id="nc_1_n1t"]/span')
-    # 长按拖拽
-    action = ActionChains(driver)
-    # 长按
-    action.click_and_hold(start)
-    # 拉动
-    action.drag_and_drop_by_offset(start, 308, 0).perform()
+    driver.find_element_by_xpath('//div[@class="form-group"]/input[@id="nameNormal"]').send_keys('15256017820')
     time.sleep(1)
+    # 找到密码输入框
+    driver.find_element_by_xpath('//div[@class="form-group m-t-md"]/input[@id="pwdNormal"]').send_keys('sl123456')
+    time.sleep(1)
+    slide_discern()
+    # 滑动条定位
+    # start = driver.find_element_by_xpath('//div[@id="nc_1_n1t"]/span')
+    # 长按拖拽
+    # action = ActionChains(driver)
+    # 长按
+    # action.click_and_hold(start)
+    # 拉动
+    # action.drag_and_drop_by_offset(start, 320, 0).perform()
+    time.sleep(5)
     # 保存图片
-    save()
+    # save()
     # 此处延时为了手动输入验证码（省钱。）
-    time.sleep(10)
+    # time.sleep(10)
     # 超级鹰识别验证码
     # ocr = chaoji()
     # # 输入验证码
@@ -76,14 +137,15 @@ def login_web():
     driver.save_screenshot('web.png')
     # 点击登录
     driver.find_element_by_xpath('//form[@id="user_login_normal"]/button').click()
-    time.sleep(3)
+    # time.sleep(3)
     # 关闭弹窗
-    driver.find_element_by_xpath('//div[@class="bindwx"]/button/span[1]').click()
-
+    # driver.find_element_by_xpath('//div[@class="bindwx"]/button/span[1]').click()
+    cookie_list = driver.get_cookies()
+    print(cookie_list)
 
 def run():
     # 读取本地文件
-    with open('data.json', 'r') as f:
+    with open('data.json', encoding='utf-8') as f:
         datas = json.load(f)
         data_list = []
         for i in datas:
@@ -333,4 +395,4 @@ def run():
 
 if __name__ == '__main__':
     login_web()
-    run()
+    # run()
