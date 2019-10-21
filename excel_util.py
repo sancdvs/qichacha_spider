@@ -1,5 +1,7 @@
 import xlwt
-# import xlrd
+import xlrd
+import os
+from xlutils.copy import copy
 
 # 创建一个样式对象，初始化样式
 style_title = xlwt.XFStyle()  # 标题样式
@@ -82,3 +84,76 @@ def len_byte(value):
     length = (utf8_length - length) / 2 + length
     return int(length)
 
+# 读取excel行数
+def read_excel_rows(filePath,sheetindex):
+    # 打开文件
+    x1 = xlrd.open_workbook(filePath)
+    # 获取sheet的汇总数据
+    sheet = x1.sheet_by_index(sheetindex)
+    # print("sheet name:{}".format(sheet.name))  # get sheet name
+    # print("row num:{}".format(sheet.nrows))  # get sheet all rows number
+    # print("col num:{}".format(sheet.ncols))  # get sheet all columns number
+    return sheet.nrows
+
+
+# 判断文件是否存在
+def check_file(filePath):
+    # print(os.path.exists(filePath)) # 文件是否存在
+    # print(os.path.isfile(filePath)) # 是否是文件
+    # print(os.access(filePath, os.W_OK)) # 检查文件是否可以写入
+    return os.path.exists(filePath) and os.access(filePath, os.W_OK)
+
+
+# 获取工作簿中所有的合并单元格
+def get_merged_cells(sheet):
+    """
+    获取所有的合并单元格，格式如下：
+    [(4, 5, 2, 4), (5, 6, 2, 4), (1, 4, 3, 4)]
+    (4, 5, 2, 4) 的含义为：行 从下标4开始，到下标5（不包含）  列 从下标2开始，到下标4（不包含），为合并单元格
+    :param sheet:
+    :return:
+    """
+    return sheet.merged_cells
+
+
+# 获取合并单元格的值
+def get_merged_cells_value(filePath, sheetindex, row_index, col_index):
+    """
+    先判断给定的单元格，是否属于合并单元格；
+    如果是合并单元格，就返回合并单元格的内容
+    :return:
+    """
+    is_merged_cell = False
+    cell_value = None
+    # 打开文件
+    x1 = xlrd.open_workbook(filePath)
+    # 获取sheet的汇总数据
+    sheet = x1.sheet_by_index(sheetindex)
+    merged = get_merged_cells(sheet)
+    for (rlow, rhigh, clow, chigh) in merged:
+        if (row_index >= rlow and row_index < rhigh):
+            if (col_index >= clow and col_index < chigh):
+                cell_value = sheet.cell_value(rlow, clow)
+                is_merged_cell = True
+                print('该单元格[%d,%d]属于合并单元格，值为[%s]' % (row_index, col_index, cell_value))
+                break
+    if not is_merged_cell:
+        cell_value = sheet.cell_value(row_index, col_index)
+    return cell_value
+
+
+if __name__ == '__main__':
+    filename = '企业信息_1571407930.xls'
+    filePath = os.path.join(os.getcwd(), filename)
+    print(filePath)
+    # print(check_file(filePath))
+    # print(read_excel_rows(filePath))
+    # xlutils:修改excel
+    book1 = xlrd.open_workbook(filePath,formatting_info=True)
+    book2 = copy(book1)  # 拷贝一份原来的excel
+    # print(dir(book2))
+    sheet = book2.get_sheet(0)  # 获取第几个sheet页，book2现在的是xlutils里的方法，不是xlrd的
+    sheet.write(763, 0, 763,style)
+    sheet.write(763, 1, 'ss',style)
+    sheet.get
+    book2.save(filePath)

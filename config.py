@@ -1,6 +1,8 @@
 # 目标采集地址
-base_url1 = 'http://m.qichacha.com'
-base_url = 'http://m.qichacha.com/search?key='
+import os
+
+base_url1 = 'https://www.qichacha.com'
+base_url = 'https://www.qichacha.com/search?key='
 # 爬取目标页面超时时间
 spider_timeout = 30
 # 爬取目标页面重试次数
@@ -27,3 +29,5 @@ phantomjs_driver = r'\phantomjs-2.1.1-windows\bin\phantomjs.exe'
 chrome_driver = r'.\chromedriver_win32\chromedriver.exe'
 # 日志目录
 log_dir = r'\logs'
+# 抓取结果文件路径
+spider_result_file_name = os.path.join(os.getcwd(), '企业抓取信息.xls')
