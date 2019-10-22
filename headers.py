@@ -211,7 +211,14 @@ def generateProxyCookie(proxy_ip):
         proxy.http_proxy = getWebdriverProxy(proxy_ip)
         # 将代理设置添加到desired_capabilities中
         proxy.add_to_capabilities(desired_capabilities)
-        driver = webdriver.PhantomJS(executable_path=phantomjs_driver)
+        # 获取当前文件路径
+        current_path = inspect.getfile(inspect.currentframe())
+        # 获取当前文件所在目录，相当于当前文件的父目录
+        dir_name = os.path.dirname(current_path)
+        # 转换为绝对路径
+        file_abs_path = os.path.abspath(dir_name)
+        driver = webdriver.PhantomJS(executable_path=file_abs_path + phantomjs_driver,
+                                     service_log_path=file_abs_path + log_dir + r'\ghostdriver.log')
         driver.start_session(desired_capabilities)
         # 隐式等待5秒，可以自己调节
         driver.implicitly_wait(5)
@@ -353,10 +360,12 @@ def getCookie2():
 if __name__ == '__main__':
     # getCookie()
     # getCookie2()
-    for i in range(100):
-        generateCookie()
+    # for i in range(100):
+    #     generateCookie()
     # generateProxyCookie(_proxy())
     # print('等待一分钟...')
     # time.sleep(60)
     # interval_time = time.time() - start_time
     # print(interval_time//60)
+    print(os.path.join(os.getcwd(), phantomjs_driver))
+    print(os.path.join(os.getcwd(), log_dir + r'\ghostdriver.log'))

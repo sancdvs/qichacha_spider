@@ -144,22 +144,22 @@ if __name__ == '__main__':
                         error_data_list.append(name)
                         print("抓取页面 {}，异常 {} 可能被企查查网站反爬拦截了！".format(start_url, response.status_code))
                         continue
-                    # _response = response.text
+                    _response = response.text
                     soup = BeautifulSoup(response.text, 'lxml')
-                    # print("========================返回信息===========================")
-                    # print(_response)
-                    # content = etree.HTML(_response)
-                    # print(content)
+                    print("========================返回信息===========================")
+                    print(_response)
+                    content = etree.HTML(_response)
+                    print(content)
                     # 获取筛选信息链接
                     com_all_info = soup.find_all(class_='m_srchList')[0].tbody
                     search_url = com_all_info.select('tr')[0].select('td')[2].select('a')[0].get('href')   # 取第一条数据
                     # search_url = re.findall('</div> <a href="(.*?)" class="a-decoration"> <div class="list-item"> <div class="list-item-top">',_response)
-                    if len(search_url) < 1:
+                    if '' == search_url:
                         print('该cookie被企查查网站反爬拦截了，需重新生成，请稍后再试！')
                         error_data_list.append(name)
                         continue
                     print("获取筛选信息链接=============={}".format(search_url))
-                    url = base_url1 + search_url[0]
+                    url = base_url1 + search_url
                     # print(url)
                     # print('*' * 100)
                     time.sleep(random.randint(3, 10))  # 每隔3到10秒

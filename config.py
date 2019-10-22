@@ -1,6 +1,6 @@
-# 目标采集地址
 import os
 
+# 目标采集地址
 base_url1 = 'https://www.qichacha.com'
 base_url = 'https://www.qichacha.com/search?key='
 # 爬取目标页面超时时间
@@ -19,8 +19,8 @@ cookie_retry_num = 5
 # 获取cookie批次的间隔时间(秒)
 cookie_interval_time = 60*30
 # 获取代理ip地址，这边需要本地部署一个提供代理IP的应用，这里使用的是proxy_list-master
-proxy_ip_url = 'http://127.0.0.1:8111/proxy?count=10'
-# proxy_ip_url = 'http://127.0.0.1:8111/proxy'
+# proxy_ip_url = 'http://127.0.0.1:8111/proxy?count=10'
+proxy_ip_url = 'http://127.0.0.1:8111/proxy'
 # 搜索企业文件名称
 enterprise_search_file = r'./enterprise_search.txt'
 # phantomjs驱动
