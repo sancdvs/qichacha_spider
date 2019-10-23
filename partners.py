@@ -14,9 +14,10 @@ def export_partners(data_list,workbook, is_new):
         worksheet.write(0, 1, u"公司名称", style_title)
         worksheet.write(0, 2, u"股东名称", style_title)
         worksheet.write(0, 3, u"持股比例", style_title)
-        worksheet.write(0, 4, u"股东类型", style_title)
-        worksheet.write(0, 5, u"认缴出资额(万元)", style_title)
+        worksheet.write(0, 4, u"认缴出资额(万元)", style_title)
         worksheet.write(0, 6, u"认缴出资日期", style_title)
+        worksheet.write(0, 6, u"实缴出资额(万元)", style_title)
+        worksheet.write(0, 7, u"实缴出资日期", style_title)
 
         # Setting row height and column width 设置宽和高 xlwt中是行和列都是从0开始计算的
         worksheet.col(1).width = 256 * 50
@@ -25,6 +26,7 @@ def export_partners(data_list,workbook, is_new):
         worksheet.col(4).width = 256 * 30
         worksheet.col(5).width = 256 * 30
         worksheet.col(6).width = 256 * 30
+        worksheet.col(7).width = 256 * 30
     else:
         start_row = read_excel_rows(spider_result_file_name, 1)
         worksheet = workbook.get_sheet(1)
@@ -32,7 +34,6 @@ def export_partners(data_list,workbook, is_new):
 
     for _response in data_list:
         partner_array = _response.select("#partnerslist > table > tr")
-    for _response in data_list:
         order_number += 1
         # 公司名称
         company_name = _response.find(class_="row title jk-tip").select('h1')[0].text.replace('\n', '').replace(' ', '')
@@ -45,9 +46,9 @@ def export_partners(data_list,workbook, is_new):
         # print(_response)
         # list = re.findall('<div class="stock-item">(.*?\s*\n*.*?\s*\n*.*?\s*\n*)</div>\n?\s*</div>\n?\s*</div>\n?\s*</div>', _response)
         # print(len(list))
-        if len(partner_array) > 0:
-            worksheet.write_merge(start_row, start_row + len(partner_array)-1, 0, 0, order_number, style_merge)   # 序号
-            worksheet.write_merge(start_row, start_row + len(partner_array)-1, 1, 1, company_name, style_merge)  # 合并公司名称单元格
+        if len(partner_array)-1 > 0:
+            worksheet.write_merge(start_row, start_row + len(partner_array)-2, 0, 0, order_number, style_merge)   # 序号
+            worksheet.write_merge(start_row, start_row + len(partner_array)-2, 1, 1, company_name, style_merge)  # 合并公司名称单元格
         else:
             worksheet.write(start_row, 0, order_number, style)
             worksheet.write(start_row, 1, company_name, style)
@@ -56,6 +57,7 @@ def export_partners(data_list,workbook, is_new):
             worksheet.write(start_row, 4, '--', style)
             worksheet.write(start_row, 5, '--', style)
             worksheet.write(start_row, 6, '--', style)
+            worksheet.write(start_row, 7, '--', style)
             start_row += 1
     #
         for i in range(1,len(partner_array)):
