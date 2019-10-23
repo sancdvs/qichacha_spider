@@ -16,7 +16,7 @@ from xlutils.copy import copy
 
 from basic_info import export_basic_inf
 from config import base_url, base_url1, enterprise_search_file, spider_timeout, spider_retry_num, cookie_interval_time, \
-    spider_result_file_name
+    spider_result_file_name, crawl_interval_mintime, crawl_interval_maxtime
 from error_data import export_error_data
 from excel_util import check_file
 from proxy_ip import _proxy, is_internet
@@ -65,6 +65,7 @@ def get_retry(url,isProxy):
             response = requests.get(url, headers=get_headers(), timeout=spider_timeout)
         if response.status_code == 200:
             break
+        time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))
     return response
 
 
@@ -151,18 +152,19 @@ if __name__ == '__main__':
                     # content = etree.HTML(_response)
                     # print(content)
                     # 获取筛选信息链接
-                    com_all_info = soup.find_all(class_='m_srchList')[0].tbody
-                    search_url = com_all_info.select('tr')[0].select('td')[2].select('a')[0].get('href')   # 取第一条数据
                     # search_url = re.findall('</div> <a href="(.*?)" class="a-decoration"> <div class="list-item"> <div class="list-item-top">',_response)
-                    if '' == search_url:
+                    com_all_info = soup.find_all(class_='m_srchList')
+                    if len(com_all_info) > 0:
+                        search_url = com_all_info[0].tbody.select('tr')[0].select('td')[2].select('a')[0].get('href')   # 取第一条数据
+                    else:
                         print('请求企查查网站操作频繁，被反爬拦截了，需等待一段时间再试！')
                         error_data_list.append(name)
-                        continue
+                        break
                     print("获取筛选信息链接=============={}".format(search_url))
                     url = base_url1 + search_url
                     # print(url)
                     # print('*' * 100)
-                    time.sleep(random.randint(3, 10))  # 每隔3到10秒
+                    time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))  # 每隔3到10秒
                     if is_proxy == 'y':
                         proxy = _proxy()
                         print('正在使用代理{}，抓取页面 {}'.format(proxy, url))
@@ -196,7 +198,7 @@ if __name__ == '__main__':
                 if len(data_list) > 0 or len(error_data_list) > 0:
                     print('==================正在写入excel文件，请勿关闭程序！==================')
                     export_excel(data_list,error_data_list)
-                time.sleep(random.randint(5, 20))  # 每隔5到20秒
+                time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))  # 每隔5到20秒
             f.close()
     else:
         print('====================本程序只能在外网环境下运行====================')

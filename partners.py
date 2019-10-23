@@ -30,22 +30,14 @@ def export_partners(data_list,workbook, is_new):
     else:
         start_row = read_excel_rows(spider_result_file_name, 1)
         worksheet = workbook.get_sheet(1)
-        order_number = get_merged_cells_value(spider_result_file_name, 1, start_row-1, 0)  # 序号位置是第一列
+        order_number = int(get_merged_cells_value(spider_result_file_name, 1, start_row-1, 0))  # 序号位置是第一列
 
     for _response in data_list:
-        partner_array = _response.select("#partnerslist > table > tr")
         order_number += 1
         # 公司名称
         company_name = _response.find(class_="row title jk-tip").select('h1')[0].text.replace('\n', '').replace(' ', '')
-        # company_name = re.findall('<div class="company-name">(.*?\s*)<', _response)
-        if len(company_name) > 0:
-            company_name = company_name[0].strip()
-        else:
-            company_name = '--'
         print('公司名称：' + company_name)
-        # print(_response)
-        # list = re.findall('<div class="stock-item">(.*?\s*\n*.*?\s*\n*.*?\s*\n*)</div>\n?\s*</div>\n?\s*</div>\n?\s*</div>', _response)
-        # print(len(list))
+        partner_array = _response.select("#partnerslist > table > tr")
         if len(partner_array)-1 > 0:
             worksheet.write_merge(start_row, start_row + len(partner_array)-2, 0, 0, order_number, style_merge)   # 序号
             worksheet.write_merge(start_row, start_row + len(partner_array)-2, 1, 1, company_name, style_merge)  # 合并公司名称单元格
@@ -60,40 +52,47 @@ def export_partners(data_list,workbook, is_new):
             worksheet.write(start_row, 7, '--', style)
             start_row += 1
     #
-        for i in range(1,len(partner_array)):
+        for i in range(1, len(partner_array)):
             #股东及出资信息
-            partner_name = partner_array[i].select('td')[1].select('h3')[0]
-            if len(partner_name)>0:
-                partner_name = partner_array[i].select('td')[1].select('h3')[0].text.replace('\n', '').replace(' ', '')
-                worksheet.write(start_row, 2, partner_name, style)  # 将信息输入表格
+            partner_name = partner_array[i].select('td')[1].select('h3')[0].text.replace('\n', '').replace(' ', '')
+            worksheet.write(start_row, 2, partner_name, style)  # 将信息输入表格
+            print('股东名称：' + partner_name)
             #持股比例
-            stock_rate = partner_array[i].select('td')[2]
-            if len(stock_rate)>0:
-              stock_rate= partner_array[i].select('td')[2].text.replace('\n', '').replace(' ', '')
-              worksheet.write(start_row, 3, stock_rate, style)  # 将信息输入表格
+            stock_rate= partner_array[i].select('td')[2].text.replace('\n', '').replace(' ', '')
+            if '%' in stock_rate:
+                stock_rate = stock_rate.split('%')[0]+'%'
+            worksheet.write(start_row, 3, stock_rate, style)  # 将信息输入表格
+            print('持股比例：' + stock_rate)
             #认缴出资额(万元)
-            money = partner_array[i].select('td')[3]
-            if len(money)>0:
-                money= partner_array[i].select('td')[3].text.replace('\n', '').replace(' ', '')
-                worksheet.write(start_row, 4, money, style)  # 将信息输入表格
+            money= partner_array[i].select('td')[3].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            worksheet.write(start_row, 4, money, style)  # 将信息输入表格
+            print('认缴出资额：' + money)
             #认缴出资日期
-            time = partner_array[i].select('td')[4]
-            if len(time)>0:
-                time = partner_array[i].select('td')[4].text.replace('\n', '').replace(' ', '')
-                worksheet.write(start_row, 5, time, style)  # 将信息输入表格
+            time = partner_array[i].select('td')[4].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            worksheet.write(start_row, 5, time, style)  # 将信息输入表格
+            print('认缴出资日期：' + time)
             #实缴出资额(万元)
-            real_money = partner_array[i].select('td')[5]
-            if len(real_money)> 0:
-                real_money = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '')
-                worksheet.write(start_row, 6, real_money, style)  # 将信息输入表格
+            real_money = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            worksheet.write(start_row, 6, real_money, style)  # 将信息输入表格
+            print('实缴出资额：' + real_money)
             #实缴出资日期
-            real_time = partner_array[i].select('td')[6]
-            if len(real_time)>0:
-                real_time = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '')
-                worksheet.write(start_row, 7, real_time, style)  # 将信息输入表格
+            real_time = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            worksheet.write(start_row, 7, real_time, style)  # 将信息输入表格
+            print('实缴出日期：' + real_time)
+            start_row += 1
+
+            # 公司名称
+            # company_name = re.findall('<div class="company-name">(.*?\s*)<', _response)
+            # if len(company_name) > 0:
+            #     company_name = company_name[0].strip()
+            # else:
+            #     company_name = '--'
+            # print('公司名称：' + company_name)
+            # print(_response)
+            # list = re.findall('<div class="stock-item">(.*?\s*\n*.*?\s*\n*.*?\s*\n*)</div>\n?\s*</div>\n?\s*</div>\n?\s*</div>', _response)
+            # for partner in list:
             # print(partner)
             # partner_list = re.findall('<div class="stock-text">(.*?\s*)<', partner)
-            #
             # #股东名称
             # partner_name = re.findall(' <div class="stock-title"> <span > <a class="text-blue a-decoration"( href=".*?")? >(.*?\s*)</a>', partner)
             # if len(partner_name) > 0:

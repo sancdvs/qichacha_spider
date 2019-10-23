@@ -7,6 +7,10 @@ base_url = 'https://www.qichacha.com/search?key='
 spider_timeout = 30
 # 爬取目标页面重试次数
 spider_retry_num = 3
+# 爬取页面的间隔最小时间（秒）,防止被反爬
+crawl_interval_mintime = 60*5
+# 爬取页面的间隔最大时间（秒）,防止被反爬
+crawl_interval_maxtime = 60*10
 # 生成cookie网址
 generate_cookie_url = 'https://www.qichacha.com/user_login'
 # generate_cookie_url = 'https://m.qichacha.com/user_login'
