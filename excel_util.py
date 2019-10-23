@@ -126,7 +126,8 @@ def get_merged_cells_value(filePath, sheetindex, row_index, col_index):
     is_merged_cell = False
     cell_value = None
     # 打开文件
-    x1 = xlrd.open_workbook(filePath)
+    # 读取文件的时候需要将formatting_info参数设置为True，默认是False，不然上面获取合并的单元格数组为空
+    x1 = xlrd.open_workbook(filePath,formatting_info=True)
     # 获取sheet的汇总数据
     sheet = x1.sheet_by_index(sheetindex)
     merged = get_merged_cells(sheet)
@@ -135,7 +136,7 @@ def get_merged_cells_value(filePath, sheetindex, row_index, col_index):
             if (col_index >= clow and col_index < chigh):
                 cell_value = sheet.cell_value(rlow, clow)
                 is_merged_cell = True
-                print('该单元格[%d,%d]属于合并单元格，值为[%s]' % (row_index, col_index, cell_value))
+                # print('该单元格[%d,%d]属于合并单元格，值为[%s]' % (row_index, col_index, cell_value))
                 break
     if not is_merged_cell:
         cell_value = sheet.cell_value(row_index, col_index)
@@ -143,17 +144,23 @@ def get_merged_cells_value(filePath, sheetindex, row_index, col_index):
 
 
 if __name__ == '__main__':
-    filename = '企业信息_1571407930.xls'
+    filename = '企业抓取信息.xls'
     filePath = os.path.join(os.getcwd(), filename)
     print(filePath)
     # print(check_file(filePath))
     # print(read_excel_rows(filePath))
     # xlutils:修改excel
-    book1 = xlrd.open_workbook(filePath,formatting_info=True)
-    book2 = copy(book1)  # 拷贝一份原来的excel
-    # print(dir(book2))
-    sheet = book2.get_sheet(0)  # 获取第几个sheet页，book2现在的是xlutils里的方法，不是xlrd的
-    sheet.write(763, 0, 763,style)
-    sheet.write(763, 1, 'ss',style)
-    sheet.get
-    book2.save(filePath)
+    # book1 = xlrd.open_workbook(filePath,formatting_info=True)
+    # book2 = copy(book1)  # 拷贝一份原来的excel
+    # # print(dir(book2))
+    # sheet = book2.get_sheet(0)  # 获取第几个sheet页，book2现在的是xlutils里的方法，不是xlrd的
+    # sheet.write(763, 0, 763,style)
+    # sheet.write(763, 1, 'ss',style)
+    # sheet.get
+    # book2.save(filePath)
+    # 打开文件
+    x1 = xlrd.open_workbook(filePath,formatting_info=True)
+    # 获取sheet的汇总数据
+    sheet = x1.sheet_by_index(2)
+    print(sheet.name)
+    print(sheet.merged_cells)

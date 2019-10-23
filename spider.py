@@ -42,7 +42,7 @@ def export_excel(data,error_data):
         # 导出企业股东信息
         print("=======================================企业股东信息======================================")
         export_partners(data, workbook, is_new)
-        # 导出企业主要人员
+        # 导出企业主要人员s
         print("=======================================企业主要人员======================================")
         export_key_personnel(data, workbook, is_new)
     # 导出抓取失败企业名称
@@ -145,17 +145,17 @@ if __name__ == '__main__':
                         print("抓取页面 {}，异常 {} 可能被企查查网站反爬拦截了！".format(start_url, response.status_code))
                         continue
                     _response = response.text
-                    soup = BeautifulSoup(response.text, 'lxml')
-                    print("========================返回信息===========================")
-                    print(_response)
-                    content = etree.HTML(_response)
-                    print(content)
+                    soup = BeautifulSoup(_response, 'lxml')
+                    # print("========================返回信息===========================")
+                    # print(_response)
+                    # content = etree.HTML(_response)
+                    # print(content)
                     # 获取筛选信息链接
                     com_all_info = soup.find_all(class_='m_srchList')[0].tbody
                     search_url = com_all_info.select('tr')[0].select('td')[2].select('a')[0].get('href')   # 取第一条数据
                     # search_url = re.findall('</div> <a href="(.*?)" class="a-decoration"> <div class="list-item"> <div class="list-item-top">',_response)
                     if '' == search_url:
-                        print('该cookie被企查查网站反爬拦截了，需重新生成，请稍后再试！')
+                        print('请求企查查网站操作频繁，被反爬拦截了，需等待一段时间再试！')
                         error_data_list.append(name)
                         continue
                     print("获取筛选信息链接=============={}".format(search_url))
@@ -179,24 +179,24 @@ if __name__ == '__main__':
                         print("抓取页面 {}，异常 {} 可能被企查查网站反爬拦截了！".format(url, response1.status_code))
                         error_data_list.append(name)
                         continue
-                    # _response1 = response1.text
-                    _response1 = BeautifulSoup(response1.text, 'lxml')
+                    _response1 = response1.text
+                    _soup = BeautifulSoup(_response1, 'lxml')
                     # print("========================返回信息===========================")
                     # print(_response1)
                     # content = etree.HTML(_response1)
                     # print(content)
-                    data_list.append(_response1)
+                    data_list.append(_soup)
                     print("{}=============抓取成功！".format(name))
                 except Exception as e:
                     print(name+'=========================抓取该公司的信息异常')
                     error_data_list.append(name)
                     print(str(e))
                     continue
-                time.sleep(random.randint(5, 20))   # 每隔5到20秒
                 # 导出excel
                 if len(data_list) > 0 or len(error_data_list) > 0:
                     print('==================正在写入excel文件，请勿关闭程序！==================')
                     export_excel(data_list,error_data_list)
+                time.sleep(random.randint(5, 20))  # 每隔5到20秒
             f.close()
     else:
         print('====================本程序只能在外网环境下运行====================')
