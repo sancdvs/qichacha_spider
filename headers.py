@@ -9,6 +9,8 @@ import requests
 import urllib
 from urllib import request
 from http import cookiejar
+
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver import DesiredCapabilities
@@ -17,13 +19,15 @@ import ssl
 #设置忽略SSL验证
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.proxy import ProxyType
+from fake_useragent import UserAgent
 
 from config import phantomjs_driver, generate_cookie_url, chrome_driver, generate_cookie_url, cookie_max_num, \
-    cookie_timeout, cookie_retry_num, cookie_interval_time, log_dir
+    cookie_timeout, cookie_retry_num, cookie_interval_time, log_dir, crawl_interval_mintime, crawl_interval_maxtime, \
+    base_url1
 from proxy_ip import _proxy
 
 ssl._create_default_https_context = ssl._create_unverified_context
-# ua = UserAgent()
+ua = UserAgent(verify_ssl=False)
 is_clear = False
 
 # 请求头设置
@@ -64,8 +68,8 @@ cookies_remote = [
 
 
 def random_user_agent():
-    # ua.random()
-    return random.choice(user_agent)
+    return ua.random
+    # return random.choice(user_agent)
 
 
 def random_cookie():
@@ -80,21 +84,21 @@ def get_headers():
         # 'X-Requested-With': 'XMLHttpRequest',
         # 'Accept-Encoding': 'gzip, deflate, br',
         # 'Accept-Language': 'zh-CN,zh;q=0.9',
-        'User-Agent': random.choice(user_agent),
+        'User-Agent': random_user_agent(),
         'cookie': getGenerateCookie()
     }
 
 
 def get_proxy_headers(proxy_ip):
+    userAgent = random_user_agent()
     return {
-        # 'Host': 'm.qichacha.com',
-        # 'Connection': 'keep-alive',
-        # 'Accept': 'text/html, */*; q=0.01',
-        # 'X-Requested-With': 'XMLHttpRequest',
-        # 'Accept-Encoding': 'gzip, deflate, br',
-        # 'Accept-Language': 'zh-CN,zh;q=0.9',
-        'User-Agent': random.choice(user_agent),
-        'cookie': generateProxyCookie(proxy_ip)
+        'Host': "www.qichacha.com",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Encoding": "gzip, deflate",
+        "Accept-Language": "en-US,en;q=0.5",
+        # "Connection": "keep-alive",
+        'User-Agent': userAgent,
+        'cookie': generateProxyCookie(userAgent, proxy_ip)
     }
 
 
@@ -123,7 +127,7 @@ def generateCookie():
         for j in range(cookie_retry_num):
             desired_capabilities = DesiredCapabilities.PHANTOMJS.copy()
             # 从USER_AGENTS列表中随机选一个浏览器头，伪装浏览器
-            desired_capabilities["phantomjs.page.settings.userAgent"] = (random.choice(user_agent))
+            desired_capabilities["phantomjs.page.settings.userAgent"] = random_user_agent()
             # 不载入图片，爬页面速度会快很多
             desired_capabilities["phantomjs.page.settings.loadImages"] = False
 
@@ -195,71 +199,89 @@ def generateCookie():
 
 
 # 使用代理生成cookie
-def generateProxyCookie(proxy_ip):
+def generateProxyCookie(userAgent,proxy_ip):
     cookie = None
-    if len(cookies_remote) > 0:
-        return random.choice(cookies_remote)
-    for i in range(cookie_retry_num):
-        desired_capabilities = DesiredCapabilities.PHANTOMJS.copy()
-        # 从USER_AGENTS列表中随机选一个浏览器头，伪装浏览器
-        desired_capabilities["phantomjs.page.settings.userAgent"] = (random.choice(user_agent))
-        # 不载入图片，爬页面速度会快很多
-        desired_capabilities["phantomjs.page.settings.loadImages"] = False
-        # 利用DesiredCapabilities(代理设置)参数值，重新打开一个sessionId，我看意思就相当于浏览器清空缓存后，加上代理重新访问一次url
-        proxy = webdriver.Proxy()
-        proxy.proxy_type = ProxyType.MANUAL
-        proxy.http_proxy = getWebdriverProxy(proxy_ip)
-        # 将代理设置添加到desired_capabilities中
-        proxy.add_to_capabilities(desired_capabilities)
-        # 获取当前文件路径
-        current_path = inspect.getfile(inspect.currentframe())
-        # 获取当前文件所在目录，相当于当前文件的父目录
-        dir_name = os.path.dirname(current_path)
-        # 转换为绝对路径
-        file_abs_path = os.path.abspath(dir_name)
-        driver = webdriver.PhantomJS(executable_path=file_abs_path + phantomjs_driver,
-                                     service_log_path=file_abs_path + log_dir + r'\ghostdriver.log')
-        driver.start_session(desired_capabilities)
-        # 隐式等待5秒，可以自己调节
-        driver.implicitly_wait(5)
-        # 设置10秒页面超时返回，类似于requests.get()的timeout选项，driver.get()没有timeout选项
-        # 以前遇到过driver.get(url)一直不返回，但也不报错的问题，这时程序会卡住，设置超时选项能解决这个问题。
-        driver.set_page_load_timeout(10)
-        # 设置10秒脚本超时时间
-        driver.set_script_timeout(10)
-        try:
-            # driver.get(generate_cookie_url)
-            driver.get(generate_cookie_url)
-            cookie_list = driver.get_cookies()
-            # print(cookie_list)
-            # session_id
-            # session_id = driver.session_id
-            # html源码
-            # page_source = driver.page_source
-            # print(page_source)
-            cookie_lst = []
-            # 格式化打印cookie
-            for cookiee in cookie_list:
-                cookie_lst.append('{}={}'.format(cookiee['name'], cookiee['value']))
-            cookie = "; ".join(cookie_lst)
-            cookies_remote.append(cookie)
-            break
-        except TimeoutException as e:
-            print('==============使用代理生成cookie超时============')
-            print(str(e))
-            print('请求超时{}次，正在重新生成cookie......'.format(i+1))
-            # cookie = random.choice(cookies_remote)
-        except Exception as e:
-            print('==============使用代理生成cookie异常============')
-            print(str(e))
-            print('请求异常{}次，正在重新生成cookie......'.format(i+1))
-            # cookie = random.choice(cookies_remote)
-        finally:
-            driver.close()
-            driver.quit()  # phantomJS进程需要关闭，不然在内存中驻留的phantomJS进程越来越多，最终吃光内存。
-        time.sleep(random.randint(3, 10))  # 每隔3到10秒
-    print('cookie=============={}'.format(cookie))
+    headers = {
+        'Host': "www.qichacha.com",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Encoding": "gzip, deflate",
+        "Accept-Language": "en-US,en;q=0.5",
+        # "Connection": "keep-alive",
+        "User-Agent": userAgent
+    }
+    with requests.Session() as r:
+        r.get(generate_cookie_url, headers=headers, proxies=proxy_ip, timeout=cookie_timeout)
+        # print(r.headers)
+        # print(r.cookies.keys())
+        cookie_lst = []
+        for k, v in r.cookies.get_dict().items():
+            cookie_lst.append('{}={}'.format(k, v))
+        cookie = "; ".join(cookie_lst)
+    # print('cookie=============={}'.format(cookie))
     return cookie
+    # if len(cookies_remote) > 0:
+    #     return random.choice(cookies_remote)
+    # for i in range(cookie_retry_num):
+    #     desired_capabilities = DesiredCapabilities.PHANTOMJS.copy()
+    #     # 从USER_AGENTS列表中随机选一个浏览器头，伪装浏览器
+    #     desired_capabilities["phantomjs.page.settings.userAgent"] = random_user_agent()
+    #     # 不载入图片，爬页面速度会快很多
+    #     desired_capabilities["phantomjs.page.settings.loadImages"] = False
+    #     # 利用DesiredCapabilities(代理设置)参数值，重新打开一个sessionId，我看意思就相当于浏览器清空缓存后，加上代理重新访问一次url
+    #     proxy = webdriver.Proxy()
+    #     proxy.proxy_type = ProxyType.MANUAL
+    #     proxy.http_proxy = getWebdriverProxy(proxy_ip)
+    #     # 将代理设置添加到desired_capabilities中
+    #     proxy.add_to_capabilities(desired_capabilities)
+    #     # 获取当前文件路径
+    #     current_path = inspect.getfile(inspect.currentframe())
+    #     # 获取当前文件所在目录，相当于当前文件的父目录
+    #     dir_name = os.path.dirname(current_path)
+    #     # 转换为绝对路径
+    #     file_abs_path = os.path.abspath(dir_name)
+    #     driver = webdriver.PhantomJS(executable_path=file_abs_path + phantomjs_driver,
+    #                                  service_log_path=file_abs_path + log_dir + r'\ghostdriver.log')
+    #     driver.start_session(desired_capabilities)
+    #     # 隐式等待5秒，可以自己调节
+    #     driver.implicitly_wait(5)
+    #     # 设置10秒页面超时返回，类似于requests.get()的timeout选项，driver.get()没有timeout选项
+    #     # 以前遇到过driver.get(url)一直不返回，但也不报错的问题，这时程序会卡住，设置超时选项能解决这个问题。
+    #     driver.set_page_load_timeout(10)
+    #     # 设置10秒脚本超时时间
+    #     driver.set_script_timeout(10)
+    #     try:
+    #         # driver.get(generate_cookie_url)
+    #         driver.get(generate_cookie_url)
+    #         cookie_list = driver.get_cookies()
+    #         # print(cookie_list)
+    #         # session_id
+    #         # session_id = driver.session_id
+    #         # html源码
+    #         # page_source = driver.page_source
+    #         # print(page_source)
+    #         cookie_lst = []
+    #         # 格式化打印cookie
+    #         for cookiee in cookie_list:
+    #             cookie_lst.append('{}={}'.format(cookiee['name'], cookiee['value']))
+    #         cookie = "; ".join(cookie_lst)
+    #         cookies_remote.append(cookie)
+    #         break
+    #     except TimeoutException as e:
+    #         print('==============使用代理生成cookie超时============')
+    #         print(str(e))
+    #         print('请求超时{}次，正在重新生成cookie......'.format(i+1))
+    #         # cookie = random.choice(cookies_remote)
+    #     except Exception as e:
+    #         print('==============使用代理生成cookie异常============')
+    #         print(str(e))
+    #         print('请求异常{}次，正在重新生成cookie......'.format(i+1))
+    #         # cookie = random.choice(cookies_remote)
+    #     finally:
+    #         driver.close()
+    #         driver.quit()  # phantomJS进程需要关闭，不然在内存中驻留的phantomJS进程越来越多，最终吃光内存。
+    #     time.sleep(random.randint(3, 10))  # 每隔3到10秒
+    # print('cookie=============={}'.format(cookie))
+    # return cookie
 
 
 # 使用代理生成cookie
@@ -357,15 +379,139 @@ def getCookie2():
         print('Value = %s' % item.value)
 
 
+def getChromeProxyIp(proxy_ip):
+   for ip in proxy_ip.values():
+       return ip
+
+
 if __name__ == '__main__':
     # getCookie()
     # getCookie2()
     # for i in range(100):
-    #     generateCookie()
+    # generateCookie()
+    # print('cookie=============={}'.format(cookies_local))
     # generateProxyCookie(_proxy())
     # print('等待一分钟...')
     # time.sleep(60)
     # interval_time = time.time() - start_time
     # print(interval_time//60)
-    print(os.path.join(os.getcwd(), phantomjs_driver))
-    print(os.path.join(os.getcwd(), log_dir + r'\ghostdriver.log'))
+    # print(os.path.join(os.getcwd(), phantomjs_driver))
+    # print(os.path.join(os.getcwd(), log_dir + r'\ghostdriver.log'))
+    # print(ua.random)
+    for i in range(100):
+        url = 'https://www.qichacha.com/user_login'
+        start_url = 'https://www.qichacha.com/search?key=安徽宝光特钢集团万里电力铁塔有限公司'
+        proxy_ip = _proxy()
+        uag = ua.random
+        print(proxy_ip)
+        # print(uag)
+        get_proxy_headers(proxy_ip)
+        # headers = {
+        #     'Host': "www.qichacha.com",  # 需要修改
+        #     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        #     "Accept-Encoding": "gzip, deflate",
+        #     "Accept-Language": "en-US,en;q=0.5",
+        #     # "Connection": "keep-alive",
+        #     "User-Agent": uag
+        # }
+        # with requests.Session() as r:
+        #     r.get(url, headers=headers, proxies=proxy_ip, timeout=20)
+        #     # print(r.headers)
+        #     # print(r.cookies.keys())
+        #     cookie_lst = []
+        #     for k, v in r.cookies.get_dict().items():
+        #         cookie_lst.append('{}={}'.format(k, v))
+        #     cookie = "; ".join(cookie_lst)
+        # print('cookie=============={}'.format(cookie))
+        # headers = {
+        #     'Host': "www.qichacha.com",  # 需要修改
+        #     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        #     "Accept-Encoding": "gzip, deflate",
+        #     "Accept-Language": "en-US,en;q=0.5",
+        #     # "Connection": "keep-alive",
+        #     "User-Agent": uag,
+        #     'cookie': cookie
+        # }
+        # html = requests.get(start_url, headers=headers, proxies=proxy_ip, timeout=20)
+        # print(html.text.encode('utf-8'))
+        # soup = BeautifulSoup(html.text, 'lxml')
+        # com_all_info = soup.find_all(class_='m_srchList')
+        # if len(com_all_info) > 0:
+        #     search_url = com_all_info[0].tbody.select('tr')[0].select('td')[2].select('a')[0].get('href')  # 取第一条数据
+        #     print(search_url)
+        #     url = base_url1 + search_url
+        #     time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))
+        #     html = requests.get(url, headers=headers, proxies=proxy_ip, timeout=20)
+        #     print(html.text.encode('utf-8'))
+        #     _soup = BeautifulSoup(html.text, 'lxml')
+        #     basic_informatiion_array = _soup.select("#Cominfo > table > tr")  # 符号">"为上一个标签下的直接子标签
+        #     if len(basic_informatiion_array) > 0:
+        #         # 法人
+        #         legal_person = basic_informatiion_array[0].select('td')[1].select('h2')[0].text.replace('\n', '').replace(' ', '')
+        #         print('抓取法人{}{}次：'.format(legal_person,i+1))
+        # else:
+        #     print('请求企查查网站操作频繁，被反爬拦截了，需等待一段时间再试！')
+        # time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))
+
+    # html = requests.get(url, headers=headers, timeout=20, proxies=proxy_ip)  # .decode('utf-8')
+    # print(html.text.encode('utf-8'))
+    # # print(html.cookies.get_dict())
+    # cookie_lst = []
+    # for k,v in html.cookies.get_dict().items():
+    #     cookie_lst.append('{}={}'.format(k, v))
+    # cookie = "; ".join(cookie_lst)
+    # print(cookie)
+    # 创建一个参数对象,用来控制chrome以无界面打开
+    # chrome_options = Options()
+    # chrome_options = webdriver.ChromeOptions()
+    # chrome_options.add_argument('--user-agent='+uag)
+    # chrome_options.add_argument('--headless')  # 开启无界面模式
+    # chrome_options.add_argument('--disable-gpu')  # 禁用gpu，解决一些莫名的问题
+    # # chrome_options.add_argument('--no-sandbox')
+    # # 设置代理
+    # chrome_options.add_argument("--proxy-server="+getChromeProxyIp(proxy_ip))
+    # # 获取当前文件路径
+    # current_path = inspect.getfile(inspect.currentframe())
+    # # 获取当前文件所在目录，相当于当前文件的父目录
+    # dir_name = os.path.dirname(current_path)
+    # # 转换为绝对路径
+    # file_abs_path = os.path.abspath(dir_name)
+    # driver = webdriver.Chrome(executable_path=file_abs_path+chrome_driver, chrome_options=chrome_options)  # 此方法总是超时
+    # # driver = webdriver.Chrome(executable_path=file_abs_path+chrome_driver)
+    # driver.maximize_window()
+    # # 隐式等待5秒，可以自己调节
+    # driver.implicitly_wait(5)
+    # # 设置10秒页面超时返回，类似于requests.get()的timeout选项，driver.get()没有timeout选项
+    # # 以前遇到过driver.get(url)一直不返回，但也不报错的问题，这时程序会卡住，设置超时选项能解决这个问题。
+    # driver.set_page_load_timeout(cookie_timeout)
+    # # 设置10秒脚本超时时间
+    # driver.set_script_timeout(cookie_timeout)
+    # driver.get(url)
+    # cookie_list = driver.get_cookies()
+    # print(cookie_list)
+    # cookie_lst = []
+    # # 格式化打印cookie
+    # for cookiee in cookie_list:
+    #     cookie_lst.append('{}={}'.format(cookiee['name'], cookiee['value']))
+    # cookie = "; ".join(cookie_lst)
+    # print('cookie=============={}'.format(cookie))
+    # driver.close()
+    # driver.quit()  # phantomJS进程需要关闭，不然在内存中驻留的phantomJS进程越来越多，最终吃光内存。
+    # headers = {
+    #     # 'Host': "www.qichacha.com",  # 需要修改
+    #     # "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    #     # "Accept-Encoding": "gzip, deflate",
+    #     # "Accept-Language": "en-US,en;q=0.5",
+    #     # "Connection": "keep-alive",
+    #     "User-Agent": uag,
+    #     'cookie': cookie
+    # }
+    # html = requests.get(start_url, headers=headers, proxies=proxy_ip, timeout=20)
+    # print(html.text.encode('utf-8'))
+    # soup = BeautifulSoup(html.text, 'lxml')
+    # com_all_info = soup.find_all(class_='m_srchList')
+    # if len(com_all_info) > 0:
+    #     search_url = com_all_info[0].tbody.select('tr')[0].select('td')[2].select('a')[0].get('href')  # 取第一条数据
+    #     print(search_url)
+    # else:
+    #     print('请求企查查网站操作频繁，被反爬拦截了，需等待一段时间再试！')

@@ -129,7 +129,7 @@ def export_partners(data_list,workbook, is_new):
             #     time = '--'
             # print('认缴出资日期：' + time)
             # worksheet.write(start_row, 6, time,style)  # 将信息输入表格
-            start_row += 1
+            # start_row += 1
         print('----------------------------------------------------------------------')
     return worksheet
 
