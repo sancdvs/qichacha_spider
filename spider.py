@@ -1,5 +1,7 @@
 # encoding:utf-8
 # requests库用于爬取HTML页面，提交网络抓取
+import logging
+
 import openpyxl
 import requests
 # xlwt模块针对Excel文件的创建、设置、保存
@@ -64,8 +66,12 @@ def retry_crawl(url, isProxy):
             response = requests.get(url, headers=get_proxy_headers(proxy), proxies=proxy, timeout=spider_timeout)
         else:
             response = requests.get(url, headers=get_headers(), timeout=spider_timeout)
-        # if response.status_code == 200:
-        #     break
+        soup = BeautifulSoup(response.text, 'lxml')
+        com_all_info = soup.find_all(class_='m_srchList')
+        if len(com_all_info) > 0:
+            break
+        else:
+            print(response.text.encode('utf-8'))
         time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))
     return response
 
@@ -209,7 +215,8 @@ if __name__ == '__main__':
                 except Exception as e:
                     print(name + '=========================抓取该公司的信息异常')
                     error_data_list.append(name)
-                    print(str(e))
+                    # print(str(e))
+                    logging.exception(e)
                     continue
                 # 导出excel
                 if len(data_list) > 0 or len(error_data_list) > 0:
