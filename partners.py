@@ -57,8 +57,6 @@ def export_partners(data_list,workbook, is_new):
     #
         for i in range(1, len(partner_array)):
             partner = partner_array[0].select('th')
-            a= partner_array[i].select('td')
-            print(partner)
             #股东及出资信息
             partner_name = partner_array[i].select('td')[1].select('h3')[0].text.replace('\n', '').replace(' ', '')
             worksheet.write(start_row, 2, partner_name, style)  # 将信息输入表格
@@ -70,32 +68,57 @@ def export_partners(data_list,workbook, is_new):
             worksheet.write(start_row, 3, stock_rate, style)  # 将信息输入表格
             print('持股比例：' + stock_rate)
             #最终受益股份
-            if partner[3] == '最终受益股份' :
+            if partner[3].text == '最终受益股份':
               final_rate = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '')
+              if '%' in final_rate:
+                  final_rate= final_rate.split('%')[0]+'%'
             else:
                 final_rate = '--'
             worksheet.write(start_row, 4, final_rate, style)  # 将信息输入表格
             print('最终受益股份：' + final_rate)
 
-            #认缴出资额(万元)
-            money= partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            # 认缴出资额(万元)
+            if len(partner) == 5:
+                money = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            elif len(partner) == 7:
+                money = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            elif len(partner) == 8:
+                money = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            else:
+                money = '--'
             worksheet.write(start_row, 5, money, style)  # 将信息输入表格
             print('认缴出资额：' + money)
+
             #认缴出资日期
-            time = partner_array[i].select('td')[7].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            if len(partner) == 5:
+                time = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            elif len(partner) == 7:
+                time = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            elif len(partner) == 8:
+                time = partner_array[i].select('td')[7].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            else:
+                time = '--'
             worksheet.write(start_row, 6, time, style)  # 将信息输入表格
             print('认缴出资日期：' + time)
+
             #实缴出资额(万元)
-            if len(partner)>6:
-             real_money = partner_array[i].select('td')[8].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-            else :
+            if len(partner) == 7:
+                real_money = partner_array[i].select('td')[7].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            elif len(partner) == 8:
+                real_money = partner_array[i].select('td')[8].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            else:
                 real_money = '--'
             worksheet.write(start_row, 7, real_money, style)  # 将信息输入表格
             print('实缴出资额：' + real_money)
+
             #实缴出资日期
-            if len(partner)> 7:
-              real_time = partner_array[i].select('td')[9].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-            else :
+            if len(partner) == 7:
+                real_time = partner_array[i].select('td')[8].text.replace('\n', '').replace(' ', '').replace('<br>',
+                                                                                                              '')
+            elif len(partner) == 8:
+                real_time = partner_array[i].select('td')[9].text.replace('\n', '').replace(' ', '').replace('<br>',
+                                                                                                              '')
+            else:
                 real_time = '--'
             worksheet.write(start_row, 8, real_time, style)  # 将信息输入表格
             print('实缴出日期：' + real_time)
