@@ -82,25 +82,32 @@ def verify(url):
 def retry_crawl(url, isProxy):
     response = None
     for i in range(spider_retry_num):
-        print('返回异常！第{}次试图爬取页面{}'.format(i + 1, url))
-        if isProxy:
-            proxy = _proxy()
-            print('正在使用代理{}，抓取页面 {}'.format(proxy, url))
-            response = requests.get(url, headers=get_proxy_headers(proxy), proxies=proxy, timeout=spider_timeout)
-        else:
-            response = requests.get(url, headers=get_headers(), timeout=spider_timeout)
+        print('抓取异常！正在试图第{}次抓取页面{}'.format(i + 1, url))
+        try:
+            if isProxy:
+                proxy = _proxy()
+                print('正在使用代理{}，抓取页面 {}'.format(proxy, url))
+                response = requests.get(url, headers=get_proxy_headers(proxy), proxies=proxy, timeout=spider_timeout)
+            else:
+                response = requests.get(url, headers=get_headers(), timeout=spider_timeout)
+        except requests.exceptions.ProxyError as e:
+            # logging.exception(e)
+            continue
+        except requests.exceptions.ConnectTimeout as e:
+            # logging.exception(e)
+            continue
         soup = BeautifulSoup(response.text, 'lxml')
         com_all_info = soup.find_all(class_='m_srchList')
         _response = response.text
         if len(com_all_info) > 0:
             break
-        elif '<script>window.location.href=' in _response:  # 操作频繁验证链接
-            verify_url = re.findall("<script>window.location.href='(.*?)';</script>", _response)[0]
-            print('由于操作频繁被企查查识别为爬虫，请手动点击此链接验证：{}'.format(verify_url))
-            # verify(verify_url)
-            time.sleep(20)
-        else:
-            print(response.text.encode('utf-8'))
+        # elif '<script>window.location.href=' in _response:  # 操作频繁验证链接
+        #     verify_url = re.findall("<script>window.location.href='(.*?)';</script>", _response)[0]
+        #     print('由于操作频繁被企查查识别为爬虫，请手动点击此链接验证：{}'.format(verify_url))
+        #     # verify(verify_url)
+        #     time.sleep(20)
+        # else:
+        #     print(response.text.encode('utf-8'))
         time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))
     return response
 
@@ -156,7 +163,7 @@ if __name__ == '__main__':
 
         is_ok = input("请确认企业名称是否规范y/n？：")
         if 'y' == is_ok.lower():
-            is_proxy = 'y'
+            is_proxy = 'n'
             # is_proxy = input("是否启用ip代理y/n？：")
             if is_proxy == 'y':
                 is_proxy = True
@@ -201,7 +208,7 @@ if __name__ == '__main__':
                     else:
                         try:
                             response = requests.get(start_url, headers=get_headers(), timeout=spider_timeout)
-                        except requests.exceptions.Timeout as e:
+                        except Exception as e:
                             response = retry_crawl(start_url, is_proxy)
                     if response.status_code != 200:
                         error_data_list.append(name)
@@ -224,12 +231,12 @@ if __name__ == '__main__':
                         print('正在使用代理{}，抓取页面 {}'.format(proxy, url))
                         try:
                             response1 = requests.get(url, headers=get_proxy_headers(proxy), proxies=proxy, timeout=spider_timeout)
-                        except requests.exceptions.Timeout as e:
+                        except Exception as e:
                             response1 = retry_crawl(url, is_proxy)
                     else:
                         try:
                             response1 = requests.get(url, headers=get_headers(), timeout=spider_timeout)
-                        except requests.exceptions.Timeout as e:
+                        except Exception as e:
                             response1 = retry_crawl(url, is_proxy)
                     if response1.status_code != 200:
                         print("抓取页面 {}，异常 {} 可能被企查查网站反爬拦截了！".format(url, response1.status_code))
@@ -237,17 +244,13 @@ if __name__ == '__main__':
                         continue
                     _response1 = response1.text
                     _soup = BeautifulSoup(_response1, 'lxml')
-                    # print("========================返回信息===========================")
-                    # print(_response1)
-                    # content = etree.HTML(_response1)
-                    # print(content)
                     data_list.append(_soup)
                     print("{}=============抓取成功！".format(name))
                 except Exception as e:
                     print(name + '=========================抓取该公司的信息异常')
                     error_data_list.append(name)
                     # print(str(e))
-                    logging.exception(e)
+                    # logging.exception(e)
                     continue
                 # 导出excel
                 if len(data_list) > 0 or len(error_data_list) > 0:

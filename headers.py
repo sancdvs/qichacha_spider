@@ -1,5 +1,6 @@
 # from fake_useragent import UserAgent
 import inspect
+import logging
 import os
 import re
 import random
@@ -398,59 +399,70 @@ if __name__ == '__main__':
     # print(os.path.join(os.getcwd(), phantomjs_driver))
     # print(os.path.join(os.getcwd(), log_dir + r'\ghostdriver.log'))
     # print(ua.random)
+    num = 0
     for i in range(100):
         url = 'https://www.qichacha.com/user_login'
         start_url = 'https://www.qichacha.com/search?key=安徽宝光特钢集团万里电力铁塔有限公司'
         proxy_ip = _proxy()
         uag = ua.random
         print(proxy_ip)
-        # print(uag)
-        get_proxy_headers(proxy_ip)
-        # headers = {
-        #     'Host': "www.qichacha.com",  # 需要修改
-        #     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        #     "Accept-Encoding": "gzip, deflate",
-        #     "Accept-Language": "en-US,en;q=0.5",
-        #     # "Connection": "keep-alive",
-        #     "User-Agent": uag
-        # }
-        # with requests.Session() as r:
-        #     r.get(url, headers=headers, proxies=proxy_ip, timeout=20)
-        #     # print(r.headers)
-        #     # print(r.cookies.keys())
-        #     cookie_lst = []
-        #     for k, v in r.cookies.get_dict().items():
-        #         cookie_lst.append('{}={}'.format(k, v))
-        #     cookie = "; ".join(cookie_lst)
-        # print('cookie=============={}'.format(cookie))
-        # headers = {
-        #     'Host': "www.qichacha.com",  # 需要修改
-        #     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        #     "Accept-Encoding": "gzip, deflate",
-        #     "Accept-Language": "en-US,en;q=0.5",
-        #     # "Connection": "keep-alive",
-        #     "User-Agent": uag,
-        #     'cookie': cookie
-        # }
-        # html = requests.get(start_url, headers=headers, proxies=proxy_ip, timeout=20)
-        # print(html.text.encode('utf-8'))
-        # soup = BeautifulSoup(html.text, 'lxml')
-        # com_all_info = soup.find_all(class_='m_srchList')
-        # if len(com_all_info) > 0:
-        #     search_url = com_all_info[0].tbody.select('tr')[0].select('td')[2].select('a')[0].get('href')  # 取第一条数据
-        #     print(search_url)
-        #     url = base_url1 + search_url
-        #     time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))
-        #     html = requests.get(url, headers=headers, proxies=proxy_ip, timeout=20)
-        #     print(html.text.encode('utf-8'))
-        #     _soup = BeautifulSoup(html.text, 'lxml')
-        #     basic_informatiion_array = _soup.select("#Cominfo > table > tr")  # 符号">"为上一个标签下的直接子标签
-        #     if len(basic_informatiion_array) > 0:
-        #         # 法人
-        #         legal_person = basic_informatiion_array[0].select('td')[1].select('h2')[0].text.replace('\n', '').replace(' ', '')
-        #         print('抓取法人{}{}次：'.format(legal_person,i+1))
-        # else:
-        #     print('请求企查查网站操作频繁，被反爬拦截了，需等待一段时间再试！')
+        print(uag)
+        # get_proxy_headers(proxy_ip)
+        headers = {
+            'Host': "www.qichacha.com",  # 需要修改
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Encoding": "gzip, deflate",
+            "Accept-Language": "en-US,en;q=0.5",
+            # "Connection": "keep-alive",
+            "User-Agent": uag
+        }
+        try:
+            with requests.Session() as r:
+                r.get(url, headers=headers, proxies=proxy_ip, timeout=20)
+                # print(r.headers)
+                # print(r.cookies.keys())
+                cookie_lst = []
+                for k, v in r.cookies.get_dict().items():
+                    cookie_lst.append('{}={}'.format(k, v))
+                cookie = "; ".join(cookie_lst)
+            print('cookie=============={}'.format(cookie))
+        except requests.exceptions.ProxyError as e:
+            logging.exception(e)
+            continue
+        except requests.exceptions.ConnectTimeout as e:
+            logging.exception(e)
+            continue
+
+        headers = {
+            'Host': "www.qichacha.com",  # 需要修改
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Encoding": "gzip, deflate",
+            "Accept-Language": "en-US,en;q=0.5",
+            # "Connection": "keep-alive",
+            "User-Agent": uag,
+            'cookie': cookie
+        }
+        html = requests.get(start_url, headers=headers, proxies=proxy_ip, timeout=20)
+        print(html.text.encode('utf-8'))
+        soup = BeautifulSoup(html.text, 'lxml')
+        com_all_info = soup.find_all(class_='m_srchList')
+        if len(com_all_info) > 0:
+            search_url = com_all_info[0].tbody.select('tr')[0].select('td')[2].select('a')[0].get('href')  # 取第一条数据
+            print(search_url)
+            url = base_url1 + search_url
+            time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))
+            html = requests.get(url, headers=headers, proxies=proxy_ip, timeout=20)
+            print(html.text.encode('utf-8'))
+            _soup = BeautifulSoup(html.text, 'lxml')
+            basic_informatiion_array = _soup.select("#Cominfo > table > tr")  # 符号">"为上一个标签下的直接子标签
+            if len(basic_informatiion_array) > 0:
+                num += 1
+                # 法人
+                legal_person = basic_informatiion_array[0].select('td')[1].select('h2')[0].text.replace('\n', '').replace(' ', '')
+                print('抓取法人{}：{}次'.format(legal_person,num))
+        else:
+            print('请求企查查网站操作频繁，被反爬拦截了，需等待一段时间再试！')
+    print('总共成功抓取：{}次'.format(num))
         # time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))
 
     # html = requests.get(url, headers=headers, timeout=20, proxies=proxy_ip)  # .decode('utf-8')
