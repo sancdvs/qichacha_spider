@@ -93,7 +93,7 @@ def export_partners(data_list,workbook, is_new):
             if len(partner) == 5:
                 time = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
             elif len(partner) == 7:
-                time = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+                time = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
             elif len(partner) == 8:
                 time = partner_array[i].select('td')[7].text.replace('\n', '').replace(' ', '').replace('<br>', '')
             else:
