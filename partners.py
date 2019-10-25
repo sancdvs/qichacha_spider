@@ -14,10 +14,11 @@ def export_partners(data_list,workbook, is_new):
         worksheet.write(0, 1, u"公司名称", style_title)
         worksheet.write(0, 2, u"股东名称", style_title)
         worksheet.write(0, 3, u"持股比例", style_title)
-        worksheet.write(0, 4, u"认缴出资额(万元)", style_title)
+        worksheet.write(0, 4, u"最终受益股份", style_title)
+        worksheet.write(0, 5, u"认缴出资额(万元)", style_title)
         worksheet.write(0, 6, u"认缴出资日期", style_title)
-        worksheet.write(0, 6, u"实缴出资额(万元)", style_title)
-        worksheet.write(0, 7, u"实缴出资日期", style_title)
+        worksheet.write(0, 7, u"实缴出资额(万元)", style_title)
+        worksheet.write(0, 8, u"实缴出资日期", style_title)
 
         # Setting row height and column width 设置宽和高 xlwt中是行和列都是从0开始计算的
         worksheet.col(1).width = 256 * 50
@@ -27,6 +28,7 @@ def export_partners(data_list,workbook, is_new):
         worksheet.col(5).width = 256 * 30
         worksheet.col(6).width = 256 * 30
         worksheet.col(7).width = 256 * 30
+        worksheet.col(8).width = 256 * 30
     else:
         start_row = read_excel_rows(spider_result_file_name, 1)
         worksheet = workbook.get_sheet(1)
@@ -50,34 +52,52 @@ def export_partners(data_list,workbook, is_new):
             worksheet.write(start_row, 5, '--', style)
             worksheet.write(start_row, 6, '--', style)
             worksheet.write(start_row, 7, '--', style)
+            worksheet.write(start_row, 8, '--', style)
             start_row += 1
     #
         for i in range(1, len(partner_array)):
+            partner = partner_array[0].select('th')
+            a= partner_array[i].select('td')
+            print(partner)
             #股东及出资信息
             partner_name = partner_array[i].select('td')[1].select('h3')[0].text.replace('\n', '').replace(' ', '')
             worksheet.write(start_row, 2, partner_name, style)  # 将信息输入表格
             print('股东名称：' + partner_name)
             #持股比例
-            stock_rate= partner_array[i].select('td')[2].text.replace('\n', '').replace(' ', '')
+            stock_rate= partner_array[i].select('td')[4].text.replace('\n', '').replace(' ', '')
             if '%' in stock_rate:
                 stock_rate = stock_rate.split('%')[0]+'%'
             worksheet.write(start_row, 3, stock_rate, style)  # 将信息输入表格
             print('持股比例：' + stock_rate)
+            #最终受益股份
+            if partner[3] == '最终受益股份' :
+              final_rate = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '')
+            else:
+                final_rate = '--'
+            worksheet.write(start_row, 4, final_rate, style)  # 将信息输入表格
+            print('最终受益股份：' + final_rate)
+
             #认缴出资额(万元)
-            money= partner_array[i].select('td')[3].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-            worksheet.write(start_row, 4, money, style)  # 将信息输入表格
+            money= partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            worksheet.write(start_row, 5, money, style)  # 将信息输入表格
             print('认缴出资额：' + money)
             #认缴出资日期
-            time = partner_array[i].select('td')[4].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-            worksheet.write(start_row, 5, time, style)  # 将信息输入表格
+            time = partner_array[i].select('td')[7].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            worksheet.write(start_row, 6, time, style)  # 将信息输入表格
             print('认缴出资日期：' + time)
             #实缴出资额(万元)
-            real_money = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-            worksheet.write(start_row, 6, real_money, style)  # 将信息输入表格
+            if len(partner)>6:
+             real_money = partner_array[i].select('td')[8].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            else :
+                real_money = '--'
+            worksheet.write(start_row, 7, real_money, style)  # 将信息输入表格
             print('实缴出资额：' + real_money)
             #实缴出资日期
-            real_time = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-            worksheet.write(start_row, 7, real_time, style)  # 将信息输入表格
+            if len(partner)> 7:
+              real_time = partner_array[i].select('td')[9].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            else :
+                real_time = '--'
+            worksheet.write(start_row, 8, real_time, style)  # 将信息输入表格
             print('实缴出日期：' + real_time)
             start_row += 1
 

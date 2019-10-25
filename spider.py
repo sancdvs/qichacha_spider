@@ -1,6 +1,8 @@
 # encoding:utf-8
 # requests库用于爬取HTML页面，提交网络抓取
+import inspect
 import logging
+import os
 
 import openpyxl
 import requests
@@ -14,11 +16,12 @@ import random
 
 from bs4 import BeautifulSoup
 from lxml import etree
+from selenium import webdriver
 from xlutils.copy import copy
 
 from basic_info import export_basic_inf
 from config import base_url, base_url1, enterprise_search_file, spider_timeout, spider_retry_num, cookie_interval_time, \
-    spider_result_file_name, crawl_interval_mintime, crawl_interval_maxtime
+    spider_result_file_name, crawl_interval_mintime, crawl_interval_maxtime, chrome_driver
 from error_data import export_error_data
 from excel_util import check_file
 from proxy_ip import _proxy, is_internet
@@ -55,6 +58,26 @@ def export_excel(data, error_data):
     workbook.save(spider_result_file_name)
 
 
+def verify(url):
+    # url1 = 'https://www.qichacha.com/index_verify?type=companysearch&back=/search?key=%E5%90%88%E8%82%A5%E6%99%AF%E5%96%9C%E7%94%B5%E6%B0%94%E8%AE%BE%E5%A4%87%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8'
+    # 创建一个参数对象,用来控制chrome以无界面打开
+    # 获取当前文件路径
+    current_path = inspect.getfile(inspect.currentframe())
+    # 获取当前文件所在目录，相当于当前文件的父目录
+    dir_name = os.path.dirname(current_path)
+    # 转换为绝对路径
+    file_abs_path = os.path.abspath(dir_name)
+    driver = webdriver.Chrome(executable_path=file_abs_path+chrome_driver)
+    driver.maximize_window()
+    # 隐式等待5秒，可以自己调节
+    driver.implicitly_wait(5)
+    # 设置10秒页面超时返回，类似于requests.get()的timeout选项，driver.get()没有timeout选项
+    # 以前遇到过driver.get(url)一直不返回，但也不报错的问题，这时程序会卡住，设置超时选项能解决这个问题。
+    driver.set_page_load_timeout(10)
+    # 设置10秒脚本超时时间
+    driver.set_script_timeout(10)
+    driver.get(url)
+
 # 爬取目标页面重试
 def retry_crawl(url, isProxy):
     response = None
@@ -68,8 +91,14 @@ def retry_crawl(url, isProxy):
             response = requests.get(url, headers=get_headers(), timeout=spider_timeout)
         soup = BeautifulSoup(response.text, 'lxml')
         com_all_info = soup.find_all(class_='m_srchList')
+        _response = response.text
         if len(com_all_info) > 0:
             break
+        elif '<script>window.location.href=' in _response:  # 操作频繁验证链接
+            verify_url = re.findall("<script>window.location.href='(.*?)';</script>", _response)[0]
+            print('由于操作频繁被企查查识别为爬虫，请手动点击此链接验证：{}'.format(verify_url))
+            # verify(verify_url)
+            time.sleep(20)
         else:
             print(response.text.encode('utf-8'))
         time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))
@@ -147,6 +176,12 @@ if __name__ == '__main__':
             s.keep_alive = False
             i = 0
             for name in _enterprise_list:
+                if is_proxy:
+                    try:
+                        _proxy()
+                    except Exception as e:
+                        print('========================请先启动ip代理程序=======================')
+                        break
                 # 定义查询结果集
                 data_list = []
                 # 定义查询结果异常集
@@ -157,11 +192,7 @@ if __name__ == '__main__':
                 try:
                     print("正在抓取第{}个公司==========================={}".format(i, name))
                     if is_proxy:
-                        try:
-                            proxy = _proxy()
-                        except Exception as e:
-                            print('========================请先启动ip代理程序=======================')
-                            break
+                        proxy = _proxy()
                         print('正在使用代理{}，抓取页面 {}'.format(proxy, start_url))
                         try:
                             response = requests.get(start_url, headers=get_proxy_headers(proxy), proxies=proxy, timeout=spider_timeout)
