@@ -60,63 +60,123 @@ def export_basic_inf(data_list, workbook, is_new):
         basic_informatiion_array =_response.select("#Cominfo > table > tr")     # 符号">"为上一个标签下的直接子标签
         if len(basic_informatiion_array) > 0:
             # 法人
-            legal_person = basic_informatiion_array[0].select('td')[1].select('h2')[0].text.replace('\n', '').replace(' ', '')
+            legal_person = '-'
+            if len(basic_informatiion_array[0].select('td')) > 1:
+                legal_person_item = basic_informatiion_array[0].select('td')[0].text.replace('\n', '').replace(' ', '')
+                if len(basic_informatiion_array[0].select('td')[1].select('h2')) > 0 and '法定代表人' in legal_person_item:
+                    legal_person = basic_informatiion_array[0].select('td')[1].select('h2')[0].text.replace('\n', '').replace(' ', '')
             print('法人：' + legal_person)
             worksheet.write(start_row, 2, legal_person, style)  # 将信息输入表格
             # 注册资本
-            registration_capital = basic_informatiion_array[0].select('td')[3].text.replace('\n', '').replace(' ', '')
+            registration_capital = '-'
+            if len(basic_informatiion_array[0].select('td')) > 3:
+                registration_capital_item = basic_informatiion_array[0].select('td')[2].text.replace('\n', '').replace(' ', '')
+                if '注册资本' in registration_capital_item:
+                    registration_capital = basic_informatiion_array[0].select('td')[3].text.replace('\n', '').replace(' ', '')
             print('注册资本：' + registration_capital)
             worksheet.write(start_row, 3, registration_capital, style)  # 将信息输入表格
             # 实缴资本
-            real_capital = basic_informatiion_array[1].select('td')[1].text.replace('\n', '').replace(' ', '')
+            real_capital = '-'
+            if len(basic_informatiion_array) > 1 and len(basic_informatiion_array[1].select('td')) > 1:
+                real_capital_item = basic_informatiion_array[1].select('td')[0].text.replace('\n', '').replace(' ', '')
+                if '实缴资本' in real_capital_item:
+                    real_capital = basic_informatiion_array[1].select('td')[1].text.replace('\n', '').replace(' ', '')
             print('实缴资本：' + real_capital)
             worksheet.write(start_row, 4, real_capital, style)  # 将信息输入表格
             # 经营状态
-            operating_status = basic_informatiion_array[2].select('td')[1].text.replace('\n', '').replace(' ', '')
+            operating_status = '-'
+            if len(basic_informatiion_array) > 2 and len(basic_informatiion_array[2].select('td')) > 1:
+                operating_status_item = basic_informatiion_array[2].select('td')[0].text.replace('\n', '').replace(' ', '')
+                if '经营状态' in operating_status_item:
+                    operating_status = basic_informatiion_array[2].select('td')[1].text.replace('\n', '').replace(' ', '')
             print('经营状态：' + operating_status)
             worksheet.write(start_row, 5, operating_status, style)  # 将信息输入表格
             # 成立日期
-            establishment_date = basic_informatiion_array[2].select('td')[3].text.replace('\n', '').replace(' ', '')
+            establishment_date = '-'
+            if len(basic_informatiion_array) > 2 and len(basic_informatiion_array[2].select('td')) > 3:
+                establishment_date_item = basic_informatiion_array[2].select('td')[3].text.replace('\n', '').replace(' ', '')
+                if '成立日期' in establishment_date_item:
+                    establishment_date = basic_informatiion_array[2].select('td')[3].text.replace('\n', '').replace(' ', '')
             print('成立日期：' + establishment_date)
             worksheet.write(start_row, 6, establishment_date, style)  # 将信息输入表格
             # 统一社会信用代码
-            unified_credit_code = basic_informatiion_array[3].select('td')[1].text.replace('\n', '').replace(' ', '')
+            unified_credit_code = '-'
+            if len(basic_informatiion_array) > 3 and len(basic_informatiion_array[3].select('td')) > 1:
+                unified_credit_code_item = basic_informatiion_array[3].select('td')[0].text.replace('\n', '').replace(' ','')
+                if '统一社会信用代码' in unified_credit_code_item:
+                    unified_credit_code = basic_informatiion_array[3].select('td')[1].text.replace('\n', '').replace(' ', '')
             print('统一社会信用代码：' + unified_credit_code)
             worksheet.write(start_row, 7, unified_credit_code, style)  # 将信息输入表格
             # 纳税人识别号
-            taxpayer_identification = basic_informatiion_array[3].select('td')[3].text.replace('\n', '').replace(' ', '')
+            taxpayer_identification = '-'
+            if len(basic_informatiion_array) > 3 and len(basic_informatiion_array[3].select('td')) > 3:
+                taxpayer_identification_item = basic_informatiion_array[3].select('td')[2].text.replace('\n', '').replace(' ', '')
+                if '纳税人识别号' in taxpayer_identification_item:
+                    taxpayer_identification = basic_informatiion_array[3].select('td')[3].text.replace('\n', '').replace(' ', '')
             print('纳税人识别号：' + taxpayer_identification)
             worksheet.write(start_row, 8, taxpayer_identification, style)  # 将信息输入表格
             # 注册号
-            registration_number = basic_informatiion_array[4].select('td')[1].text.replace('\n', '').replace(' ', '')
+            registration_number = '-'
+            if len(basic_informatiion_array) > 4 and len(basic_informatiion_array[4].select('td')) > 1:
+                registration_number_item = basic_informatiion_array[4].select('td')[0].text.replace('\n', '').replace(' ', '')
+                if '注册号' in registration_number_item:
+                    registration_number = basic_informatiion_array[4].select('td')[1].text.replace('\n', '').replace(' ', '')
             print('注册号：' + registration_number)
             worksheet.write(start_row, 9, registration_number, style)  # 将信息输入表格
             # 组织机构代码
-            organization_code = basic_informatiion_array[4].select('td')[3].text.replace('\n', '').replace(' ', '')
+            organization_code = '-'
+            if len(basic_informatiion_array) > 4 and len(basic_informatiion_array[4].select('td')) > 3:
+                organization_code_item = basic_informatiion_array[4].select('td')[2].text.replace('\n', '').replace(' ', '')
+                if '组织机构代码' in organization_code_item:
+                    organization_code = basic_informatiion_array[4].select('td')[3].text.replace('\n', '').replace(' ', '')
             print('组织机构代码：' + organization_code)
             worksheet.write(start_row, 10, organization_code, style)  # 将信息输入表格
             # 企业类型
-            company_type = basic_informatiion_array[5].select('td')[1].text.replace('\n', '').replace(' ', '')
+            company_type = '-'
+            if len(basic_informatiion_array) > 5 and len(basic_informatiion_array[5].select('td')) > 1:
+                company_type_item = basic_informatiion_array[5].select('td')[0].text.replace('\n', '').replace(' ', '')
+                if '企业类型' in company_type_item:
+                    company_type = basic_informatiion_array[5].select('td')[1].text.replace('\n', '').replace(' ', '')
             print('企业类型：' + company_type)
             worksheet.write(start_row, 11, company_type, style)  # 将信息输入表格
             # 所属行业
-            industry = basic_informatiion_array[5].select('td')[3].text.replace('\n', '').replace(' ', '')
+            industry = '-'
+            if len(basic_informatiion_array) > 5 and len(basic_informatiion_array[5].select('td')) > 3:
+                industry_item = basic_informatiion_array[5].select('td')[2].text.replace('\n', '').replace(' ', '')
+                if '所属行业' in industry_item:
+                    industry = basic_informatiion_array[5].select('td')[3].text.replace('\n', '').replace(' ', '')
             print('所属行业：' + industry)
             worksheet.write(start_row, 12, industry, style)  # 将信息输入表格
             # 人员规模
-            employees = basic_informatiion_array[9].select('td')[1].text.replace('\n', '').replace(' ', '')
+            employees = '-'
+            if len(basic_informatiion_array) > 9 and len(basic_informatiion_array[9].select('td')) > 1:
+                employees_item = basic_informatiion_array[9].select('td')[0].text.replace('\n', '').replace(' ', '')
+                if '人员规模' in employees_item:
+                    employees = basic_informatiion_array[9].select('td')[1].text.replace('\n', '').replace(' ', '')
             print('人员规模：' + employees)
             worksheet.write(start_row, 13, employees, style)  # 将信息输入表格
             # 营业期限
-            business_term = basic_informatiion_array[9].select('td')[3].text.replace('\n', '').replace(' ', '')
+            business_term = '-'
+            if len(basic_informatiion_array) > 9 and len(basic_informatiion_array[9].select('td')) > 3:
+                business_term_item = basic_informatiion_array[9].select('td')[2].text.replace('\n', '').replace(' ', '')
+                if '营业期限' in business_term_item:
+                    business_term = basic_informatiion_array[9].select('td')[3].text.replace('\n', '').replace(' ', '')
             print('营业期限：' + business_term)
             worksheet.write(start_row, 14, business_term, style)  # 将信息输入表格
             # 企业地址
-            adress = basic_informatiion_array[10].select('td')[1].text.replace('查看地图', '').replace('附近企业', '').replace('\n', '').replace(' ', '')
+            adress = '-'
+            if len(basic_informatiion_array) > 10 and len(basic_informatiion_array[10].select('td')) > 1:
+                adress_item = basic_informatiion_array[10].select('td')[0].text.replace('\n','').replace(' ', '')
+                if '企业地址' in adress_item:
+                    adress = basic_informatiion_array[10].select('td')[1].text.replace('查看地图', '').replace('附近企业', '').replace('\n', '').replace(' ', '')
             print('企业地址：' + adress)
             worksheet.write(start_row, 15, adress, style)  # 将信息输入表格
             # 经营范围
-            business_scope = basic_informatiion_array[11].select('td')[1].text.replace('\n', '').replace(' ', '')
+            business_scope = '-'
+            if len(basic_informatiion_array) > 11 and len(basic_informatiion_array[11].select('td')) > 1:
+                business_scope_item = basic_informatiion_array[11].select('td')[0].text.replace('\n', '').replace(' ', '')
+                if '经营范围' in business_scope_item:
+                    business_scope = basic_informatiion_array[11].select('td')[1].text.replace('\n', '').replace(' ', '')
             print('经营范围：' + business_scope)
             worksheet.write(start_row, 16, business_scope, style)  # 将信息输入表格
         start_row += 1
