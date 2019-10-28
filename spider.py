@@ -25,7 +25,7 @@ from config import base_url, base_url1, enterprise_search_file, spider_timeout, 
 from error_data import export_error_data
 from excel_util import check_file
 from proxy_ip import _proxy, is_internet
-from headers import get_headers, get_proxy_headers, generateCookie
+from headers import get_headers, get_proxy_headers, generateCookie, cookies_local
 from partners import export_partners
 from key_personnel import export_key_personnel
 from tools.myTimer import MyTimer
@@ -116,9 +116,8 @@ def retry_crawl(url, isProxy):
 def remove_repeat(list):
     list2 = []
     for i in list:
-        name = i.replace('\n', '').replace(" ", "").replace('“', '').replace('”', '').replace('"', '').replace(')',
-                                                                                                               '）').replace(
-            '(', '（').strip()
+        name = i.replace('\n', '').replace(" ", "").replace('“', '').replace('”', '')\
+            .replace('"', '').replace(')','）').replace( '(', '（').strip()
         if '' != name and not name.isspace() and name not in list2:
             list2.append(name)
         elif '' != name and not name.isspace():
@@ -145,6 +144,20 @@ def get_detail_url(start_url, response,is_proxy):
     return search_url
 
 
+def readCookie():
+    print('正在读取cookie......')
+    f = open('cookie.txt', encoding='utf-8')
+    cookies = f.readlines()
+    for cookie in cookies:
+        cookie = cookie.replace('\n', '').strip()
+        cookies_local.append(cookie)
+    if len(cookies_local) > 0:
+        print('读取到cookie=============={}个'.format(len(cookies_local)))
+    else:
+        print('请保存登录企查查的cookie到cookie.txt文件中！')
+        return
+
+
 if __name__ == '__main__':
     print('>>>>>>>>>>>>>>>>>>>启动企查查爬虫程序>>>>>>>>>>>>>>>>>>>')
     print('********************************************************')
@@ -157,9 +170,9 @@ if __name__ == '__main__':
 
     if is_internet():
         # 启动生成cookie定时任务
-        timer = MyTimer('生成cookie', cookie_interval_time, generateCookie)
-        timer.setDaemon(True)  # 设置子线程为守护线程时，主线程一旦执行结束，则全部线程全部被终止执行
-        timer.start()
+        # timer = MyTimer('生成cookie', cookie_interval_time, generateCookie)
+        # timer.setDaemon(True)  # 设置子线程为守护线程时，主线程一旦执行结束，则全部线程全部被终止执行
+        # timer.start()
 
         is_ok = input("请确认企业名称是否规范y/n？：")
         if 'y' == is_ok.lower():
@@ -169,12 +182,13 @@ if __name__ == '__main__':
                 is_proxy = True
             else:
                 is_proxy = False
+            readCookie()    # 从文件中读取cookie
             # 打开企业搜索文件
             f = open(enterprise_search_file, encoding='utf-8')
             enterprise_list = f.readlines()
             print('开始对文件进行重复检查......')
             _enterprise_list = remove_repeat(enterprise_list)
-            print('企业总数============={}'.format(len(_enterprise_list)))
+            print('去除重复后企业总数============={}'.format(len(_enterprise_list)))
 
             # 增加重试连接次数
             requests.adapters.DEFAULT_RETRIES = 5
@@ -250,7 +264,7 @@ if __name__ == '__main__':
                     print(name + '=========================抓取该公司的信息异常')
                     error_data_list.append(name)
                     # print(str(e))
-                    # logging.exception(e)
+                    logging.exception(e)
                     continue
                 # 导出excel
                 if len(data_list) > 0 or len(error_data_list) > 0:

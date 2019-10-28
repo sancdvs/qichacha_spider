@@ -47,13 +47,7 @@ user_agent = [
 ]
 
 cookies_local = [
-    # 'Hm_lpvt_3456bee468c83cc63fb5147f119f1075=1570863645; Hm_lvt_3456bee468c83cc63fb5147f119f1075=1570863645; zg_de1d1a35bfa24ce29bbf2c7eb17e6c4f=%7B%22sid%22%3A%201570863645213%2C%22updated%22%3A%201570863645213%2C%22info%22%3A%201570863645215%2C%22superProperty%22%3A%20%22%7B%7D%22%2C%22platform%22%3A%20%22%7B%7D%22%2C%22utm%22%3A%20%22%7B%7D%22%2C%22referrerDomain%22%3A%20%22%22%7D; zg_did=%7B%22did%22%3A%20%2216dbec5021a4a-08c6a2d2b-212596f-1fa400-16dbec5021bc1%22%7D; CNZZDATA1254842228=442029587-1570858569-%7C1570858569; UM_distinctid=16dbec501f07d-04ce86a1b-212596f-1fa400-16dbec501f199; _uab_collina=157086364512186648153514; QCCSESSID=hmq62akb30eke67m1n2f278il4; acw_tc=3a31f82915708636456012732ecf3ba80b6185dee822061903f9e5b1da',
-    # 'UM_distinctid=16d4d781a883e4-0d488cc5eb0bd7-3c375c0f-1fa400-16d4d781a897c2; zg_did=%7B%22did%22%3A%20%2216d4d781c73a19-0fb78f64911642-3c375c0f-1fa400-16d4d781c74a96%22%7D; acw_tc=b461944815692075174591116e8a95313d793072a098bc5d25603e8d1f; CNZZDATA1254842228=1131157379-1569203429-%7C1570764115; PHPSESSID=08nm7mpag75i4suu6vhjktjkr5; Hm_lvt_3456bee468c83cc63fb5147f119f1075=1570582899,1570669757,1570759579,1570768721; zg_de1d1a35bfa24ce29bbf2c7eb17e6c4f=%7B%22sid%22%3A%201570768502820%2C%22updated%22%3A%201570768743947%2C%22info%22%3A%201570519912754%2C%22superProperty%22%3A%20%22%7B%7D%22%2C%22platform%22%3A%20%22%7B%7D%22%2C%22utm%22%3A%20%22%7B%7D%22%2C%22referrerDomain%22%3A%20%22%22%2C%22zs%22%3A%200%2C%22sc%22%3A%200%2C%22cuid%22%3A%20%220096bdea6a9eec62a4a96030c7eee5f4%22%7D; Hm_lpvt_3456bee468c83cc63fb5147f119f1075=1570768744',
-    # 'UM_distinctid=16d4d781a883e4-0d488cc5eb0bd7-3c375c0f-1fa400-16d4d781a897c2; zg_did=%7B%22did%22%3A%20%2216d4d781c73a19-0fb78f64911642-3c375c0f-1fa400-16d4d781c74a96%22%7D; acw_tc=b461944815692075174591116e8a95313d793072a098bc5d25603e8d1f; CNZZDATA1254842228=1131157379-1569203429-%7C1570764115; PHPSESSID=08nm7mpag75i4suu6vhjktjkr5; zg_de1d1a35bfa24ce29bbf2c7eb17e6c4f=%7B%22sid%22%3A%201570768502820%2C%22updated%22%3A%201570768721425%2C%22info%22%3A%201570519912754%2C%22superProperty%22%3A%20%22%7B%7D%22%2C%22platform%22%3A%20%22%7B%7D%22%2C%22utm%22%3A%20%22%7B%7D%22%2C%22referrerDomain%22%3A%20%22%22%2C%22zs%22%3A%200%2C%22sc%22%3A%200%2C%22cuid%22%3A%20%220096bdea6a9eec62a4a96030c7eee5f4%22%7D; Hm_lvt_3456bee468c83cc63fb5147f119f1075=1570582899,1570669757,1570759579,1570768721; Hm_lpvt_3456bee468c83cc63fb5147f119f1075=1570768721',
-    # 'UM_distinctid=16518280d1e3e5-00788a93df88f7-5b193413-1fa400-16518280d1f949; zg_did=%7B%22did%22%3A%20%2216518280dd3b45-0da4e4ab13f793-5b193413-1fa400-16518280dd51f6%22%7D; acw_tc=7b81f49815356947470295339e1fc37a590000ea6190b3cf75ab42853b; PHPSESSID=4l787fmr2v90mh2khj8n6n64l5; CNZZDATA1254842228=226405416-1535690886-null%7C1535690886; Hm_lvt_3456bee468c83cc63fb5147f119f1075=1535595956,1535618789,1535618810,1535694746; zg_de1d1a35bfa24ce29bbf2c7eb17e6c4f=%7B%22sid%22%3A%201535694746927%2C%22updated%22%3A%201535695379242%2C%22info%22%3A%201535595953976%2C%22superProperty%22%3A%20%22%7B%7D%22%2C%22platform%22%3A%20%22%7B%7D%22%2C%22utm%22%3A%20%22%7B%7D%22%2C%22referrerDomain%22%3A%20%22m.baidu.com%22%2C%22cuid%22%3A%20%227d775544e16a1cc0d0ab63b42b4b8aef%22%7D; Hm_lpvt_3456bee468c83cc63fb5147f119f1075=1535695379',
-    # 'UM_distinctid=16518280d1e3e5-00788a93df88f7-5b193413-1fa400-16518280d1f949; zg_did=%7B%22did%22%3A%20%2216518280dd3b45-0da4e4ab13f793-5b193413-1fa400-16518280dd51f6%22%7D; acw_tc=7b81f49815356947470295339e1fc37a590000ea6190b3cf75ab42853b; PHPSESSID=4l787fmr2v90mh2khj8n6n64l5; CNZZDATA1254842228=226405416-1535690886-null%7C1535690886; Hm_lvt_3456bee468c83cc63fb5147f119f1075=1535595956,1535618789,1535618810,1535694746; zg_de1d1a35bfa24ce29bbf2c7eb17e6c4f=%7B%22sid%22%3A%201535694746927%2C%22updated%22%3A%201535695791508%2C%22info%22%3A%201535595953976%2C%22superProperty%22%3A%20%22%7B%7D%22%2C%22platform%22%3A%20%22%7B%7D%22%2C%22utm%22%3A%20%22%7B%7D%22%2C%22referrerDomain%22%3A%20%22m.baidu.com%22%2C%22cuid%22%3A%20%227d775544e16a1cc0d0ab63b42b4b8aef%22%7D; Hm_lpvt_3456bee468c83cc63fb5147f119f1075=1535695792',
-    # 'UM_distinctid=16518280d1e3e5-00788a93df88f7-5b193413-1fa400-16518280d1f949; zg_did=%7B%22did%22%3A%20%2216518280dd3b45-0da4e4ab13f793-5b193413-1fa400-16518280dd51f6%22%7D; acw_tc=7b81f49815356947470295339e1fc37a590000ea6190b3cf75ab42853b; PHPSESSID=4l787fmr2v90mh2khj8n6n64l5; CNZZDATA1254842228=226405416-1535690886-null%7C1535690886; Hm_lvt_3456bee468c83cc63fb5147f119f1075=1535595956,1535618789,1535618810,1535694746; zg_de1d1a35bfa24ce29bbf2c7eb17e6c4f=%7B%22sid%22%3A%201535694746927%2C%22updated%22%3A%201535695924595%2C%22info%22%3A%201535595953976%2C%22superProperty%22%3A%20%22%7B%7D%22%2C%22platform%22%3A%20%22%7B%7D%22%2C%22utm%22%3A%20%22%7B%7D%22%2C%22referrerDomain%22%3A%20%22m.baidu.com%22%2C%22cuid%22%3A%20%227d775544e16a1cc0d0ab63b42b4b8aef%22%7D; Hm_lpvt_3456bee468c83cc63fb5147f119f1075=1535695925',
-    # 'UM_distinctid=16518280d1e3e5-00788a93df88f7-5b193413-1fa400-16518280d1f949; zg_did=%7B%22did%22%3A%20%2216518280dd3b45-0da4e4ab13f793-5b193413-1fa400-16518280dd51f6%22%7D; acw_tc=7b81f49815356947470295339e1fc37a590000ea6190b3cf75ab42853b; PHPSESSID=4l787fmr2v90mh2khj8n6n64l5; CNZZDATA1254842228=226405416-1535690886-null%7C1535690886; Hm_lvt_3456bee468c83cc63fb5147f119f1075=1535595956,1535618789,1535618810,1535694746; zg_de1d1a35bfa24ce29bbf2c7eb17e6c4f=%7B%22sid%22%3A%201535694746927%2C%22updated%22%3A%201535696003819%2C%22info%22%3A%201535595953976%2C%22superProperty%22%3A%20%22%7B%7D%22%2C%22platform%22%3A%20%22%7B%7D%22%2C%22utm%22%3A%20%22%7B%7D%22%2C%22referrerDomain%22%3A%20%22m.baidu.com%22%2C%22cuid%22%3A%20%227d775544e16a1cc0d0ab63b42b4b8aef%22%7D; Hm_lpvt_3456bee468c83cc63fb5147f119f1075=1535696005'
+    # 'UM_distinctid=16d4d781a883e4-0d488cc5eb0bd7-3c375c0f-1fa400-16d4d781a897c2; _uab_collina=156896278000246547487356; zg_did=%7B%22did%22%3A%20%2216d4d781c73a19-0fb78f64911642-3c375c0f-1fa400-16d4d781c74a96%22%7D; QCCSESSID=j5ijbf92h5mo8glg79m7n7ic13; gr_user_id=6ddfcc96-975d-4ca2-ac40-fc47c0c9cd47; acw_tc=3a31f83315716463151091796e73ee968b6b3f8a14938cf72882369393; Hm_lvt_3456bee468c83cc63fb5147f119f1075=1571726572,1571792600,1571887051,1571966887; hasShow=1; CNZZDATA1254842228=747979137-1568960098-https%253A%252F%252Fsp0.baidu.com%252F%7C1571984517; zg_de1d1a35bfa24ce29bbf2c7eb17e6c4f=%7B%22sid%22%3A%201571985618272%2C%22updated%22%3A%201571986638288%2C%22info%22%3A%201571792600028%2C%22superProperty%22%3A%20%22%7B%7D%22%2C%22platform%22%3A%20%22%7B%7D%22%2C%22utm%22%3A%20%22%7B%7D%22%2C%22referrerDomain%22%3A%20%22www.qichacha.com%22%2C%22zs%22%3A%200%2C%22sc%22%3A%200%2C%22cuid%22%3A%20%22fb8fdce6a05a5ebaaa6b99d2706f091c%22%7D; Hm_lpvt_3456bee468c83cc63fb5147f119f1075=1571986638'
 ]
 
 
@@ -79,14 +73,14 @@ def random_cookie():
 
 def get_headers():
     return {
-        # 'Host': 'm.qichacha.com',
-        # 'Connection': 'keep-alive',
-        # 'Accept': 'text/html, */*; q=0.01',
-        # 'X-Requested-With': 'XMLHttpRequest',
-        # 'Accept-Encoding': 'gzip, deflate, br',
-        # 'Accept-Language': 'zh-CN,zh;q=0.9',
+        'Host': "www.qichacha.com",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Encoding": "gzip, deflate",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Connection": "keep-alive",
         'User-Agent': random_user_agent(),
-        'cookie': getGenerateCookie()
+        # 'cookie': getGenerateCookie()
+        'Cookie': random_cookie()
     }
 
 
@@ -97,9 +91,10 @@ def get_proxy_headers(proxy_ip):
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Encoding": "gzip, deflate",
         "Accept-Language": "en-US,en;q=0.5",
-        # "Connection": "keep-alive",
+        "Connection": "keep-alive",
         'User-Agent': userAgent,
-        'cookie': generateProxyCookie(userAgent, proxy_ip)
+        # 'cookie': generateProxyCookie(userAgent, proxy_ip)
+        'Cookie': random_cookie()
     }
 
 
@@ -207,7 +202,7 @@ def generateProxyCookie(userAgent,proxy_ip):
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Encoding": "gzip, deflate",
         "Accept-Language": "en-US,en;q=0.5",
-        # "Connection": "keep-alive",
+        "Connection": "keep-alive",
         "User-Agent": userAgent
     }
     with requests.Session() as r:
@@ -408,41 +403,41 @@ if __name__ == '__main__':
         print(proxy_ip)
         print(uag)
         # get_proxy_headers(proxy_ip)
+        # headers = {
+        #     'Host': "www.qichacha.com",  # 需要修改
+        #     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        #     "Accept-Encoding": "gzip, deflate",
+        #     "Accept-Language": "en-US,en;q=0.5",
+        #     # "Connection": "keep-alive",
+        #     "User-Agent": uag
+        # }
+        # try:
+        #     with requests.Session() as r:
+        #         r.get(url, headers=headers, proxies=proxy_ip, timeout=20)
+        #         # print(r.headers)
+        #         # print(r.cookies.keys())
+        #         cookie_lst = []
+        #         for k, v in r.cookies.get_dict().items():
+        #             cookie_lst.append('{}={}'.format(k, v))
+        #         cookie = "; ".join(cookie_lst)
+        #     print('cookie=============={}'.format(cookie))
+        # except requests.exceptions.ProxyError as e:
+        #     logging.exception(e)
+        #     continue
+        # except requests.exceptions.ConnectTimeout as e:
+        #     logging.exception(e)
+        #     continue
+        cookie =  'UM_distinctid=16d4d781a883e4-0d488cc5eb0bd7-3c375c0f-1fa400-16d4d781a897c2; _uab_collina=156896278000246547487356; zg_did=%7B%22did%22%3A%20%2216d4d781c73a19-0fb78f64911642-3c375c0f-1fa400-16d4d781c74a96%22%7D; QCCSESSID=j5ijbf92h5mo8glg79m7n7ic13; gr_user_id=6ddfcc96-975d-4ca2-ac40-fc47c0c9cd47; acw_tc=3a31f83315716463151091796e73ee968b6b3f8a14938cf72882369393; Hm_lvt_3456bee468c83cc63fb5147f119f1075=1571726572,1571792600,1571887051,1571966887; hasShow=1; CNZZDATA1254842228=747979137-1568960098-https%253A%252F%252Fsp0.baidu.com%252F%7C1571984517; zg_de1d1a35bfa24ce29bbf2c7eb17e6c4f=%7B%22sid%22%3A%201571985618272%2C%22updated%22%3A%201571986638288%2C%22info%22%3A%201571792600028%2C%22superProperty%22%3A%20%22%7B%7D%22%2C%22platform%22%3A%20%22%7B%7D%22%2C%22utm%22%3A%20%22%7B%7D%22%2C%22referrerDomain%22%3A%20%22www.qichacha.com%22%2C%22zs%22%3A%200%2C%22sc%22%3A%200%2C%22cuid%22%3A%20%22fb8fdce6a05a5ebaaa6b99d2706f091c%22%7D; Hm_lpvt_3456bee468c83cc63fb5147f119f1075=1571986638'
         headers = {
             'Host': "www.qichacha.com",  # 需要修改
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Encoding": "gzip, deflate",
             "Accept-Language": "en-US,en;q=0.5",
-            # "Connection": "keep-alive",
-            "User-Agent": uag
-        }
-        try:
-            with requests.Session() as r:
-                r.get(url, headers=headers, proxies=proxy_ip, timeout=20)
-                # print(r.headers)
-                # print(r.cookies.keys())
-                cookie_lst = []
-                for k, v in r.cookies.get_dict().items():
-                    cookie_lst.append('{}={}'.format(k, v))
-                cookie = "; ".join(cookie_lst)
-            print('cookie=============={}'.format(cookie))
-        except requests.exceptions.ProxyError as e:
-            logging.exception(e)
-            continue
-        except requests.exceptions.ConnectTimeout as e:
-            logging.exception(e)
-            continue
-
-        headers = {
-            'Host': "www.qichacha.com",  # 需要修改
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Encoding": "gzip, deflate",
-            "Accept-Language": "en-US,en;q=0.5",
-            # "Connection": "keep-alive",
+            "Connection": "keep-alive",
             "User-Agent": uag,
             'cookie': cookie
         }
-        html = requests.get(start_url, headers=headers, proxies=proxy_ip, timeout=20)
+        html = requests.get(start_url, headers=headers, timeout=20)
         print(html.text.encode('utf-8'))
         soup = BeautifulSoup(html.text, 'lxml')
         com_all_info = soup.find_all(class_='m_srchList')
@@ -451,7 +446,7 @@ if __name__ == '__main__':
             print(search_url)
             url = base_url1 + search_url
             time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))
-            html = requests.get(url, headers=headers, proxies=proxy_ip, timeout=20)
+            html = requests.get(url, headers=headers, timeout=20)
             print(html.text.encode('utf-8'))
             _soup = BeautifulSoup(html.text, 'lxml')
             basic_informatiion_array = _soup.select("#Cominfo > table > tr")  # 符号">"为上一个标签下的直接子标签
@@ -462,68 +457,83 @@ if __name__ == '__main__':
                 print('抓取法人{}：{}次'.format(legal_person,num))
         else:
             print('请求企查查网站操作频繁，被反爬拦截了，需等待一段时间再试！')
+        time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))
     print('总共成功抓取：{}次'.format(num))
-        # time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))
 
-    # html = requests.get(url, headers=headers, timeout=20, proxies=proxy_ip)  # .decode('utf-8')
-    # print(html.text.encode('utf-8'))
-    # # print(html.cookies.get_dict())
-    # cookie_lst = []
-    # for k,v in html.cookies.get_dict().items():
-    #     cookie_lst.append('{}={}'.format(k, v))
-    # cookie = "; ".join(cookie_lst)
-    # print(cookie)
-    # 创建一个参数对象,用来控制chrome以无界面打开
-    # chrome_options = Options()
-    # chrome_options = webdriver.ChromeOptions()
-    # chrome_options.add_argument('--user-agent='+uag)
-    # chrome_options.add_argument('--headless')  # 开启无界面模式
-    # chrome_options.add_argument('--disable-gpu')  # 禁用gpu，解决一些莫名的问题
-    # # chrome_options.add_argument('--no-sandbox')
-    # # 设置代理
-    # chrome_options.add_argument("--proxy-server="+getChromeProxyIp(proxy_ip))
-    # # 获取当前文件路径
-    # current_path = inspect.getfile(inspect.currentframe())
-    # # 获取当前文件所在目录，相当于当前文件的父目录
-    # dir_name = os.path.dirname(current_path)
-    # # 转换为绝对路径
-    # file_abs_path = os.path.abspath(dir_name)
-    # driver = webdriver.Chrome(executable_path=file_abs_path+chrome_driver, chrome_options=chrome_options)  # 此方法总是超时
-    # # driver = webdriver.Chrome(executable_path=file_abs_path+chrome_driver)
-    # driver.maximize_window()
-    # # 隐式等待5秒，可以自己调节
-    # driver.implicitly_wait(5)
-    # # 设置10秒页面超时返回，类似于requests.get()的timeout选项，driver.get()没有timeout选项
-    # # 以前遇到过driver.get(url)一直不返回，但也不报错的问题，这时程序会卡住，设置超时选项能解决这个问题。
-    # driver.set_page_load_timeout(cookie_timeout)
-    # # 设置10秒脚本超时时间
-    # driver.set_script_timeout(cookie_timeout)
-    # driver.get(url)
-    # cookie_list = driver.get_cookies()
-    # print(cookie_list)
-    # cookie_lst = []
-    # # 格式化打印cookie
-    # for cookiee in cookie_list:
-    #     cookie_lst.append('{}={}'.format(cookiee['name'], cookiee['value']))
-    # cookie = "; ".join(cookie_lst)
-    # print('cookie=============={}'.format(cookie))
-    # driver.close()
-    # driver.quit()  # phantomJS进程需要关闭，不然在内存中驻留的phantomJS进程越来越多，最终吃光内存。
-    # headers = {
-    #     # 'Host': "www.qichacha.com",  # 需要修改
-    #     # "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    #     # "Accept-Encoding": "gzip, deflate",
-    #     # "Accept-Language": "en-US,en;q=0.5",
-    #     # "Connection": "keep-alive",
-    #     "User-Agent": uag,
-    #     'cookie': cookie
-    # }
-    # html = requests.get(start_url, headers=headers, proxies=proxy_ip, timeout=20)
-    # print(html.text.encode('utf-8'))
-    # soup = BeautifulSoup(html.text, 'lxml')
-    # com_all_info = soup.find_all(class_='m_srchList')
-    # if len(com_all_info) > 0:
-    #     search_url = com_all_info[0].tbody.select('tr')[0].select('td')[2].select('a')[0].get('href')  # 取第一条数据
-    #     print(search_url)
-    # else:
-    #     print('请求企查查网站操作频繁，被反爬拦截了，需等待一段时间再试！')
+
+
+        # 创建一个参数对象,用来控制chrome以无界面打开
+    #     chrome_options = Options()
+    #     chrome_options = webdriver.ChromeOptions()
+    #     chrome_options.add_argument('--user-agent='+uag)
+    #     chrome_options.add_argument('--headless')  # 开启无界面模式
+    #     chrome_options.add_argument('--disable-gpu')  # 禁用gpu，解决一些莫名的问题
+    #     # chrome_options.add_argument('--no-sandbox')
+    #     # 设置代理
+    #     chrome_options.add_argument("--proxy-server="+getChromeProxyIp(proxy_ip))
+    #     # 获取当前文件路径
+    #     current_path = inspect.getfile(inspect.currentframe())
+    #     # 获取当前文件所在目录，相当于当前文件的父目录
+    #     dir_name = os.path.dirname(current_path)
+    #     # 转换为绝对路径
+    #     file_abs_path = os.path.abspath(dir_name)
+    #     driver = webdriver.Chrome(executable_path=file_abs_path+chrome_driver, chrome_options=chrome_options)  # 此方法总是超时
+    #     # driver = webdriver.Chrome(executable_path=file_abs_path+chrome_driver)
+    #     driver.maximize_window()
+    #     # 隐式等待5秒，可以自己调节
+    #     driver.implicitly_wait(5)
+    #     # 设置10秒页面超时返回，类似于requests.get()的timeout选项，driver.get()没有timeout选项
+    #     # 以前遇到过driver.get(url)一直不返回，但也不报错的问题，这时程序会卡住，设置超时选项能解决这个问题。
+    #     driver.set_page_load_timeout(cookie_timeout)
+    #     # 设置10秒脚本超时时间
+    #     driver.set_script_timeout(cookie_timeout)
+    #     driver.get(url)
+    #     cookie_list = driver.get_cookies()
+    #     print(cookie_list)
+    #     cookie_lst = []
+    #     # 格式化打印cookie
+    #     for cookiee in cookie_list:
+    #         cookie_lst.append('{}={}'.format(cookiee['name'], cookiee['value']))
+    #     cookie = "; ".join(cookie_lst)
+    #     print('cookie=============={}'.format(cookie))
+    #     driver.close()
+    #     driver.quit()  # phantomJS进程需要关闭，不然在内存中驻留的phantomJS进程越来越多，最终吃光内存。
+    #     headers = {
+    #         'Host': "www.qichacha.com",  # 需要修改
+    #         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    #         "Accept-Encoding": "gzip, deflate",
+    #         "Accept-Language": "en-US,en;q=0.5",
+    #         # "Connection": "keep-alive",
+    #         'Referer': 'http://www.qichacha.com/',
+    #         "User-Agent": uag,
+    #         'cookie': cookie
+    #     }
+    #     try:
+    #         html = requests.get(start_url, headers=headers, proxies=proxy_ip, timeout=20)
+    #     except requests.exceptions.ProxyError as e:
+    #         # logging.exception(e)
+    #         continue
+    #     except requests.exceptions.ConnectTimeout as e:
+    #         # logging.exception(e)
+    #         continue
+    #     print(html.text.encode('utf-8'))
+    #     soup = BeautifulSoup(html.text, 'lxml')
+    #     com_all_info = soup.find_all(class_='m_srchList')
+    #     if len(com_all_info) > 0:
+    #         search_url = com_all_info[0].tbody.select('tr')[0].select('td')[2].select('a')[0].get('href')  # 取第一条数据
+    #         print(search_url)
+    #         url = base_url1 + search_url
+    #         time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))
+    #         html = requests.get(url, headers=headers, proxies=proxy_ip, timeout=20)
+    #         print(html.text.encode('utf-8'))
+    #         _soup = BeautifulSoup(html.text, 'lxml')
+    #         basic_informatiion_array = _soup.select("#Cominfo > table > tr")  # 符号">"为上一个标签下的直接子标签
+    #         if len(basic_informatiion_array) > 0:
+    #             num += 1
+    #             # 法人
+    #             legal_person = basic_informatiion_array[0].select('td')[1].select('h2')[0].text.replace('\n', '').replace(' ', '')
+    #             print('抓取法人{}：{}次'.format(legal_person,num))
+    #     else:
+    #         print('请求企查查网站操作频繁，被反爬拦截了，需等待一段时间再试！')
+    #     time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))
+    # print('总共成功抓取：{}次'.format(num))

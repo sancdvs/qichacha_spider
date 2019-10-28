@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 -*-
+import inspect
 import json
+import os
 import random
 import time
 import csv
@@ -16,17 +18,25 @@ import sys
 # reload(sys)
 # exec("sys.setdefaultencoding('utf-8')")
 
-from config import chrome_driver
-from headers import user_agent
+from config import chrome_driver, phantomjs_driver, log_dir
+from headers import random_user_agent
 from tools.chaojiying import Chaojiying_Client
 
 chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument('--user-agent='+random.choice(user_agent))
+# chrome_options.add_argument('--user-agent='+random_user_agent())
 # chrome_options.add_argument('--headless')  # 开启无界面模式
-# chrome_options.add_argument('--disable-gpu')  # 禁用gpu，解决一些莫名的问题
+chrome_options.add_argument('--disable-gpu')  # 禁用gpu，解决一些莫名的问题
+# chrome_options.add_argument('blink-settings=imagesEnabled=false')
 # chrome_options.add_argument('--no-sandbox')
-driver = webdriver.Chrome(executable_path=chrome_driver,chrome_options=chrome_options)
+# 获取当前文件路径
+current_path = inspect.getfile(inspect.currentframe())
+# 获取当前文件所在目录，相当于当前文件的父目录
+dir_name = os.path.dirname(current_path)
+# 转换为绝对路径
+file_abs_path = os.path.abspath(dir_name)
+driver = webdriver.Chrome(chrome_options=chrome_options, executable_path=file_abs_path+chrome_driver)
 # driver = webdriver.Chrome(executable_path=chrome_driver)
+# driver = webdriver.PhantomJS(executable_path=file_abs_path+phantomjs_driver, service_log_path=file_abs_path + log_dir+r'\ghostdriver.log')
 driver.maximize_window()
 
 
@@ -39,7 +49,7 @@ def save():
 
 
 def chaoji():
-    chaojiying = Chaojiying_Client('sunlu123', 'sl123456', '901903')  # 用户中心>>软件ID 生成一个替换 96001
+    chaojiying = Chaojiying_Client('账号', '密码', '软件ID')  # 用户中心>>软件ID 生成一个替换 96001
     im = open('a.jpg', 'rb').read()  # 本地图片文件路径 来替换 a.jpg 有时WIN系统须要//
     datas = chaojiying.PostPic(im, 1902)  # 1902 验证码类型  官方网站>>价格体系 3.4+版 print 后要加()
     ocr = datas['pic_str']
@@ -108,21 +118,23 @@ def login_web():
     driver.find_element_by_xpath('//div[@class="login-panel-head clearfix"]/div[2]').click()
     time.sleep(1)
     # 找到账号输入框
-    driver.find_element_by_xpath('//div[@class="form-group"]/input[@id="nameNormal"]').send_keys('15256017820')
+    driver.find_element_by_xpath('//div[@class="form-group"]/input[@id="nameNormal"]').send_keys('username')
     time.sleep(1)
     # 找到密码输入框
-    driver.find_element_by_xpath('//div[@class="form-group m-t-md"]/input[@id="pwdNormal"]').send_keys('sl123456')
+    driver.find_element_by_xpath('//div[@class="form-group m-t-md"]/input[@id="pwdNormal"]').send_keys('password')
     time.sleep(1)
-    slide_discern()
+    # slide_discern()
     # 滑动条定位
-    # start = driver.find_element_by_xpath('//div[@id="nc_1_n1t"]/span')
+    start = driver.find_element_by_xpath('//div[@id="nc_1_n1t"]/span')
     # 长按拖拽
-    # action = ActionChains(driver)
+    action = ActionChains(driver)
     # 长按
-    # action.click_and_hold(start)
+    action.click_and_hold(start)
     # 拉动
-    # action.drag_and_drop_by_offset(start, 320, 0).perform()
-    time.sleep(5)
+    action.drag_and_drop_by_offset(start, 308, 0).perform()
+    # 释放鼠标
+    action.release().perform()
+    time.sleep(1)
     # 保存图片
     # save()
     # 此处延时为了手动输入验证码（省钱。）
@@ -134,7 +146,7 @@ def login_web():
     # # 点击提交
     # driver.find_element_by_xpath('//div[@id="nc_1_scale_submit"]/span').click()
     # 截图
-    driver.save_screenshot('web.png')
+    # driver.save_screenshot('web.png')
     # 点击登录
     driver.find_element_by_xpath('//form[@id="user_login_normal"]/button').click()
     # time.sleep(3)
@@ -142,6 +154,12 @@ def login_web():
     # driver.find_element_by_xpath('//div[@class="bindwx"]/button/span[1]').click()
     cookie_list = driver.get_cookies()
     print(cookie_list)
+    cookie_lst = []
+    for cookiee in cookie_list:
+        cookie_lst.append('{}={}'.format(cookiee['name'], cookiee['value']))
+    cookie = "; ".join(cookie_lst)
+    print('cookie=============={}'.format(cookie))
+    # driver.close()
 
 def run():
     # 读取本地文件
