@@ -41,16 +41,19 @@ def export_key_personnel(data_list, workbook, is_new):
             worksheet.write(start_row, 2, '--', style)
             worksheet.write(start_row, 3, '--', style)
             start_row += 1
-        for i in range(1, len(personnel_array)):
-            # 姓名
-            name = personnel_array[i].select('td')[1].select('h3')[0].text.replace('\n', '').replace(' ', '')
-            print('姓名：' + name)
-            worksheet.write(start_row, 2, name, style)  # 将信息输入表格
-            # 职务
-            job = personnel_array[i].select('td')[2].text.replace('\n', '').replace(' ', '')
-            print('职务：' + job)
-            worksheet.write(start_row, 3, job, style)  # 将信息输入表格
-            start_row += 1
+        if len(personnel_array) >1:
+            for i in range(1, len(personnel_array)):
+                # 姓名
+                if len(personnel_array[i].select('td')) > 1 and len(personnel_array[i].select('td')[1].select('h3')) > 0:
+                    name = personnel_array[i].select('td')[1].select('h3')[0].text.replace('\n', '').replace(' ', '')
+                print('姓名：' + name)
+                worksheet.write(start_row, 2, name, style)  # 将信息输入表格
+                # 职务
+                if len(personnel_array[i].select('td')) > 2:
+                    job = personnel_array[i].select('td')[2].text.replace('\n', '').replace(' ', '')
+                print('职务：' + job)
+                worksheet.write(start_row, 3, job, style)  # 将信息输入表格
+                start_row += 1
 
         # order_number += 1
         # 公司名称
