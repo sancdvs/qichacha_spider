@@ -42,19 +42,30 @@ def export_excel(data, error_data):
         workbook = xlwt.Workbook(encoding="utf-8")
     # 导出企业基本信息
     if len(data) > 0:
-        print("=======================================企业基本信息======================================")
-        export_basic_inf(data, workbook, is_new)
+        print("==============================企业基本信息==============================")
+        try:
+            export_basic_inf(data, workbook, is_new)
+        except Exception as e:
+            print('===================写入企业基本信息异常===================')
+            logging.exception(e)
         # 导出企业股东信息
-        print("=======================================企业股东信息======================================")
-        export_partners(data, workbook, is_new)
+        print("==============================企业股东信息==============================")
+        try:
+            export_partners(data, workbook, is_new)
+        except Exception as e:
+            print('===================写入企业股东信息异常===================')
+            logging.exception(e)
         # 导出企业主要人员s
-        print("=======================================企业主要人员======================================")
-        export_key_personnel(data, workbook, is_new)
+        print("==============================企业主要人员==============================")
+        try:
+            export_key_personnel(data, workbook, is_new)
+        except Exception as e:
+            print('===================写入企业主要人员异常===================')
+            logging.exception(e)
     # 导出抓取失败企业名称
     if len(error_data) > 0:
-        print("=======================================导出抓取失败企业======================================")
+        print("==============================导出抓取失败企业==============================")
         export_error_data(error_data, workbook, is_new)
-    # export_excel_name = '企业信息_' + str(int(time.time())) + '.xls'
     workbook.save(spider_result_file_name)
 
 
@@ -164,7 +175,7 @@ if __name__ == '__main__':
     print('本程序运行条件：')
     print('1、请先确保本程序处于外网环境！')
     print('2、为防止企查查网站反爬，每次程序运行间隔不少于30分钟！')
-    print('3、一次爬取企业数量建议不大于50条！')
+    print('3、一次爬取企业数量建议不大于100条！')
     print('4、程序执行过程中请勿关闭！')
     print('********************************************************')
 
