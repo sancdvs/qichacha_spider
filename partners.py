@@ -3,11 +3,14 @@ import re
 from config import spider_result_file_name
 from excel_util import style_title, style_merge, style, read_excel_rows, get_merged_cells_value
 
-
+index_list = ['序号','股东信息']
 # 导出企业股东信息
 def export_partners(data_list,workbook, is_new):
     start_row = 1   # 数据起始excel行号
     order_number = 0    # 数据起始序号
+    get_index_array(data_list)
+    a= index_list
+    print(a)
     if is_new:
         worksheet = workbook.add_sheet("股东信息",cell_overwrite_ok=True)
         worksheet.write(0, 0, u"序号", style_title)
@@ -57,6 +60,7 @@ def export_partners(data_list,workbook, is_new):
     #
         for i in range(1, len(partner_array)):
             partner = partner_array[0].select('th')
+            a =partner_array[i].select('td')
             #股东及出资信息
             partner_name = partner_array[i].select('td')[1].select('h3')[0].text.replace('\n', '').replace(' ', '')
             worksheet.write(start_row, 2, partner_name, style)  # 将信息输入表格
@@ -80,6 +84,8 @@ def export_partners(data_list,workbook, is_new):
             # 认缴出资额(万元)
             if len(partner) == 5:
                 money = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            elif len(partner) == 6:
+                money = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
             elif len(partner) == 7:
                 money = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '').replace('<br>', '')
             elif len(partner) == 8:
@@ -92,6 +98,8 @@ def export_partners(data_list,workbook, is_new):
             #认缴出资日期
             if len(partner) == 5:
                 time = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            elif len(partner) == 6:
+                time = partner_array[i].select('td')[7].text.replace('\n', '').replace(' ', '').replace('<br>', '')
             elif len(partner) == 7:
                 time = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
             elif len(partner) == 8:
@@ -175,6 +183,13 @@ def export_partners(data_list,workbook, is_new):
             # start_row += 1
         print('----------------------------------------------------------------------')
     return worksheet
+
+def get_index_array(data_list):
+    for list in data_list:
+        datas =list.select("#partnerslist > table > tr")[0].select('th')
+        for i in range(2,len(datas)):
+            if datas[i].text.replace(' ', '') not in index_list:
+                index_list.append(datas[i].text.replace(' ', ''))
 
 
 if __name__ == '__main__':
