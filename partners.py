@@ -73,7 +73,9 @@ def export_partners(data_list,workbook, is_new):
                 # 查出股东表格的标题行在自定义的partner_title中的索引位置，为写入excel的列索引。
                 index = [k for k,x in enumerate(partner_title) if title in x]
                 if len(index) > 0:
-                    v = partner_row[j].text.replace('\n', '').replace(' ', '').replace('持股详情>', '')+unit
+                    v = partner_row[j].text.replace('\n', '').replace(' ', '').replace('持股详情>', '')
+                    if '-' != v:
+                        v += unit
                     print(partner_title[index[0]]+'：'+v)
                     worksheet.write(start_row, index[0], v, style)  # 将信息输入表格
                 elif len(partner_row[j].select('h3')) > 0:
