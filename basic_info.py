@@ -62,8 +62,9 @@ def export_basic_inf(data_list, workbook, is_new):
             # 法人
             legal_person = '-'
             if len(basic_informatiion_array[0].select('td')) > 1:
-                legal_person_item = basic_informatiion_array[0].select('td')[0].text.replace('\n', '').replace(' ', '')
-                if len(basic_informatiion_array[0].select('td')[1].select('h2')) > 0 and '法定代表人' in legal_person_item:
+                # legal_person_item = basic_informatiion_array[0].select('td')[0].text.replace('\n', '').replace(' ', '')
+                # if len(basic_informatiion_array[0].select('td')[1].select('h2')) > 0 and ('法定代表人' in legal_person_item or '经营者' in legal_person_item):
+                if len(basic_informatiion_array[0].select('td')[1].select('h2')) > 0:
                     legal_person = basic_informatiion_array[0].select('td')[1].select('h2')[0].text.replace('\n', '').replace(' ', '')
             print('法人：' + legal_person)
             worksheet.write(start_row, 2, legal_person, style)  # 将信息输入表格
