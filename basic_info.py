@@ -94,7 +94,7 @@ def export_basic_inf(data_list, workbook, is_new):
             # 成立日期
             establishment_date = '-'
             if len(basic_informatiion_array) > 2 and len(basic_informatiion_array[2].select('td')) > 3:
-                establishment_date_item = basic_informatiion_array[2].select('td')[3].text.replace('\n', '').replace(' ', '')
+                establishment_date_item = basic_informatiion_array[2].select('td')[2].text.replace('\n', '').replace(' ', '')
                 if '成立日期' in establishment_date_item:
                     establishment_date = basic_informatiion_array[2].select('td')[3].text.replace('\n', '').replace(' ', '')
             print('成立日期：' + establishment_date)

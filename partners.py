@@ -31,14 +31,20 @@ def export_partners(data_list,workbook, is_new):
         worksheet = workbook.get_sheet(1)
         order_number = int(get_merged_cells_value(spider_result_file_name, 1, start_row-1, 0))  # 序号位置是第一列
 
+    # 定义excel表头列表
+    partner_title = ['序号', '公司名称', '股东名称', '持股比例', '认缴出资额', '认缴出资日期', '实缴出资额', '实缴出资日期']
+
     for _response in data_list:
         order_number += 1
         # 公司名称
         company_name = _response.find(class_="row title jk-tip").select('h1')[0].text.replace('\n', '').replace(' ', '')
         print('公司名称：' + company_name)
+
         partner_array = _response.select("#partnerslist > table > tr")
-        if len(partner_array) ==0:
-            partner_array=_response.select("#partnerslist > div")[1].select('table')[0].select('tbody > tr')
+        if len(partner_array) == 0:
+            if len(_response.select("#partnerslist > div")) > 1 and len(_response.select("#partnerslist > div")[1].select('table')) > 0:
+                partner_array =_response.select("#partnerslist > div")[1].select('table')[0].select('tbody > tr')
+
         if len(partner_array)-1 > 0:
             worksheet.write_merge(start_row, start_row + len(partner_array)-2, 0, 0, order_number, style_merge)   # 序号
             worksheet.write_merge(start_row, start_row + len(partner_array)-2, 1, 1, company_name, style_merge)  # 合并公司名称单元格
@@ -52,95 +58,117 @@ def export_partners(data_list,workbook, is_new):
             worksheet.write(start_row, 6, '--', style)
             worksheet.write(start_row, 7, '--', style)
             start_row += 1
-    #
+
+        if len(partner_array) > 0:
+            partner_th = [data for data in partner_array[0].children if data != ' '][1:]  # 股东表格的标题行th,去除序号th
+            partner_tbale_th = [th.text.replace('\n', '').replace(' ', '') for th in partner_th]
+            # print('表格标题行=========={}'.format(partner_tbale_th))
+
         for i in range(1, len(partner_array)):
-            partner = partner_array[0].select('th')
-            a=partner_array[i].select('td')
-            #股东及出资信息
-            partner_name = partner_array[i].select('td')[1].select('h3')[0].text.replace('\n', '').replace(' ', '')
-            worksheet.write(start_row, 2, partner_name, style)  # 将信息输入表格
-            print('股东名称：' + partner_name)
-            #持股比例
-            stock_rate= partner_array[i].select('td')[4].text.replace('\n', '').replace(' ', '')
-            if len(partner) == 10 and partner[4].text[0:5] == '持股比例':
-                stock_rate = partner_array[i].select('td')[8].text.replace('\n', '').replace(' ', '')
-            if '%' in stock_rate:
-                stock_rate = stock_rate.split('%')[0]+'%'
-            worksheet.write(start_row, 3, stock_rate, style)  # 将信息输入表格
-            print('持股比例：' + stock_rate)
-
-            # 认缴出资额(万元)
-            if len(partner) == 5 and partner[3].text[0:5] =='认缴出资额':
-                money = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-                if money != '-':
-                        money =money+partner[3].text[5:]
-            elif len(partner) == 6 and partner[3].text[0:5] =='认缴出资额':
-                money = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-                if money != '-':
-                        money =money+partner[3].text[5:]
-            elif len(partner) == 7 and partner[3].text[0:5] =='认缴出资额':
-                money = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-                if money != '-':
-                    money = money + partner[4].text[5:]
-            elif len(partner) == 8 and partner[4].text[0:5] =='认缴出资额':
-                money = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-                if money != '-':
-                    money = money + partner[4].text[5:]
-            elif len(partner) == 10 and partner[5].text[0:5] =='认缴出资额':
-                money = partner_array[i].select('td')[9].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-                if money != '-':
-                    money = money + partner[5].text[5:]
-            else:
-                money = '--'
-            worksheet.write(start_row, 4, money, style)  # 将信息输入表格
-            print('认缴出资额：' + money)
-
-            #认缴出资日期
-            if len(partner) == 5 and partner[3].text[0:6] =='认缴出资日期':
-                time = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-            elif len(partner) == 6 and partner[4].text[0:6] =='认缴出资日期':
-                time = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-            elif len(partner) == 7 and partner[3].text[0:6] =='认缴出资日期':
-                time = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-            elif len(partner) == 8 and partner[3].text[0:6] =='认缴出资日期':
-                time = partner_array[i].select('td')[7].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-            elif len(partner) == 10 and partner[6].text[0:6] =='认缴出资日期':
-                time = partner_array[i].select('td')[10].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-            else:
-                time = '--'
-            worksheet.write(start_row, 5, time, style)  # 将信息输入表格
-            print('认缴出资日期：' + time)
-
-            #实缴出资额(万元)
-            if len(partner) == 7 and partner[5].text[0:5] =='实缴出资额':
-                real_money = partner_array[i].select('td')[7].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-                if real_money != '-':
-                    real_money=real_money+partner[5].text[5:]
-            elif len(partner) == 8 and partner[6].text[0:5] =='实缴出资额':
-                real_money = partner_array[i].select('td')[8].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-                if real_money != '-':
-                    real_money=real_money+partner[6].text[5:]
-            elif len(partner) == 10 and partner[7].text[0:5] =='实缴出资额':
-                real_money = partner_array[i].select('td')[11].text.replace('\n', '').replace(' ', '').replace('<br>', '')
-                if real_money != '-':
-                    real_money=real_money+partner[7].text[5:]
-            else:
-                real_money = '--'
-            worksheet.write(start_row, 6, real_money, style)  # 将信息输入表格
-            print('实缴出资额：' + real_money)
-
-            #实缴出资日期
-            if len(partner) == 7  and partner[6].text =='实缴出资日期' :
-                real_time = partner_array[i].select('td')[8].text.replace('\n', '').replace(' ', '').replace('<br>','')
-            elif len(partner) == 8 and partner[7].text =='实缴出资日期':
-                real_time = partner_array[i].select('td')[9].text.replace('\n', '').replace(' ', '').replace('<br>','')
-            elif len(partner) == 10 and partner[8].text =='实缴出资日期':
-                real_time = partner_array[i].select('td')[12].text.replace('\n', '').replace(' ', '').replace('<br>','')
-            else:
-                real_time = '--'
-            worksheet.write(start_row, 7, real_time, style)  # 将信息输入表格
-            print('实缴出日期：' + real_time)
+            partner_row = [data for data in partner_array[i].children if data != ' '][1:]   # 数据行，排除序号列td
+            for j in range(len(partner_row)):
+                # 去除th标题中的单位，否则自定义的partner_title中查询不到。列如：认缴出资额(万元)--》认缴出资额。
+                title = partner_tbale_th[j].split('(')[0] if '(' in partner_tbale_th[j] else partner_tbale_th[j]
+                unit = (partner_tbale_th[j].split('(')[1] if '(' in partner_tbale_th[j] else '').replace(')', '')
+                # 查出股东表格的标题行在自定义的partner_title中的索引位置，为写入excel的列索引。
+                index = [k for k,x in enumerate(partner_title) if title in x]
+                if len(index) > 0:
+                    v = partner_row[j].text.replace('\n', '').replace(' ', '')+unit
+                    print(partner_title[index[0]]+'：'+v)
+                    worksheet.write(start_row, index[0], v, style)  # 将信息输入表格
+                elif len(partner_row[j].select('h3')) > 0:
+                    partner_name = partner_row[j].select('h3')[0].text.replace('\n', '').replace(' ', '')
+                    print('股东名称：' + partner_name)
+                    worksheet.write(start_row, 2, partner_name, style)  # 将信息输入表格
             start_row += 1
+            # #股东及出资信息
+            # partner_name = '-'
+            # if len(partner_array[i].select('td')) > 1 and len(partner_array[i].select('td')[1].select('h3')) > 0:
+            #     partner_name = partner_array[i].select('td')[1].select('h3')[0].text.replace('\n', '').replace(' ', '')
+            # worksheet.write(start_row, 2, partner_name, style)  # 将信息输入表格
+            # print('股东名称：' + partner_name)
+            #
+            # #持股比例
+            # stock_rate= partner_array[i].select('td')[4].text.replace('\n', '').replace(' ', '')
+            # if len(partner) == 10 and partner[4].text[0:5] == '持股比例':
+            #     stock_rate = partner_array[i].select('td')[8].text.replace('\n', '').replace(' ', '')
+            # if '%' in stock_rate:
+            #     stock_rate = stock_rate.split('%')[0]+'%'
+            # worksheet.write(start_row, 3, stock_rate, style)  # 将信息输入表格
+            # print('持股比例：' + stock_rate)
+            #
+            # # 认缴出资额(万元)
+            # if len(partner) == 5 and partner[3].text[0:5] =='认缴出资额':
+            #     money = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            #     if money != '-':
+            #             money =money+partner[3].text[5:]
+            # elif len(partner) == 6 and partner[3].text[0:5] =='认缴出资额':
+            #     money = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            #     if money != '-':
+            #             money =money+partner[3].text[5:]
+            # elif len(partner) == 7 and partner[3].text[0:5] =='认缴出资额':
+            #     money = partner_array[i].select('td')[5].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            #     if money != '-':
+            #         money = money + partner[4].text[5:]
+            # elif len(partner) == 8 and partner[4].text[0:5] =='认缴出资额':
+            #     money = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            #     if money != '-':
+            #         money = money + partner[4].text[5:]
+            # elif len(partner) == 10 and partner[5].text[0:5] =='认缴出资额':
+            #     money = partner_array[i].select('td')[9].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            #     if money != '-':
+            #         money = money + partner[5].text[5:]
+            # else:
+            #     money = '--'
+            # worksheet.write(start_row, 4, money, style)  # 将信息输入表格
+            # print('认缴出资额：' + money)
+            #
+            # #认缴出资日期
+            # if len(partner) == 5 and partner[3].text[0:6] =='认缴出资日期':
+            #     time = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            # elif len(partner) == 6 and partner[4].text[0:6] =='认缴出资日期':
+            #     time = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            # elif len(partner) == 7 and partner[3].text[0:6] =='认缴出资日期':
+            #     time = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            # elif len(partner) == 8 and partner[3].text[0:6] =='认缴出资日期':
+            #     time = partner_array[i].select('td')[7].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            # elif len(partner) == 10 and partner[6].text[0:6] =='认缴出资日期':
+            #     time = partner_array[i].select('td')[10].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            # else:
+            #     time = '--'
+            # worksheet.write(start_row, 5, time, style)  # 将信息输入表格
+            # print('认缴出资日期：' + time)
+            #
+            # #实缴出资额(万元)
+            # if len(partner) == 7 and partner[5].text[0:5] =='实缴出资额':
+            #     real_money = partner_array[i].select('td')[7].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            #     if real_money != '-':
+            #         real_money=real_money+partner[5].text[5:]
+            # elif len(partner) == 8 and partner[6].text[0:5] =='实缴出资额':
+            #     real_money = partner_array[i].select('td')[8].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            #     if real_money != '-':
+            #         real_money=real_money+partner[6].text[5:]
+            # elif len(partner) == 10 and partner[7].text[0:5] =='实缴出资额':
+            #     real_money = partner_array[i].select('td')[11].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            #     if real_money != '-':
+            #         real_money=real_money+partner[7].text[5:]
+            # else:
+            #     real_money = '--'
+            # worksheet.write(start_row, 6, real_money, style)  # 将信息输入表格
+            # print('实缴出资额：' + real_money)
+            #
+            # #实缴出资日期
+            # if len(partner) == 7  and partner[6].text =='实缴出资日期' :
+            #     real_time = partner_array[i].select('td')[8].text.replace('\n', '').replace(' ', '').replace('<br>','')
+            # elif len(partner) == 8 and partner[7].text =='实缴出资日期':
+            #     real_time = partner_array[i].select('td')[9].text.replace('\n', '').replace(' ', '').replace('<br>','')
+            # elif len(partner) == 10 and partner[8].text =='实缴出资日期':
+            #     real_time = partner_array[i].select('td')[12].text.replace('\n', '').replace(' ', '').replace('<br>','')
+            # else:
+            #     real_time = '--'
+            # worksheet.write(start_row, 7, real_time, style)  # 将信息输入表格
+            # print('实缴出日期：' + real_time)
+            # start_row += 1
 
             # 公司名称
             # company_name = re.findall('<div class="company-name">(.*?\s*)<', _response)
@@ -191,7 +219,7 @@ def export_partners(data_list,workbook, is_new):
             # print('认缴出资日期：' + time)
             # worksheet.write(start_row, 6, time,style)  # 将信息输入表格
             # start_row += 1
-        print('----------------------------------------------------------------------')
+        # print('----------------------------------------------------------------------')
     return worksheet
 
 if __name__ == '__main__':
