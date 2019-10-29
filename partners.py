@@ -37,6 +37,8 @@ def export_partners(data_list,workbook, is_new):
         company_name = _response.find(class_="row title jk-tip").select('h1')[0].text.replace('\n', '').replace(' ', '')
         print('公司名称：' + company_name)
         partner_array = _response.select("#partnerslist > table > tr")
+        if len(partner_array) ==0:
+            partner_array=_response.select("#partnerslist > div")[1].select('table')[0].select('tbody > tr')
         if len(partner_array)-1 > 0:
             worksheet.write_merge(start_row, start_row + len(partner_array)-2, 0, 0, order_number, style_merge)   # 序号
             worksheet.write_merge(start_row, start_row + len(partner_array)-2, 1, 1, company_name, style_merge)  # 合并公司名称单元格
@@ -53,12 +55,15 @@ def export_partners(data_list,workbook, is_new):
     #
         for i in range(1, len(partner_array)):
             partner = partner_array[0].select('th')
+            a=partner_array[i].select('td')
             #股东及出资信息
             partner_name = partner_array[i].select('td')[1].select('h3')[0].text.replace('\n', '').replace(' ', '')
             worksheet.write(start_row, 2, partner_name, style)  # 将信息输入表格
             print('股东名称：' + partner_name)
             #持股比例
             stock_rate= partner_array[i].select('td')[4].text.replace('\n', '').replace(' ', '')
+            if len(partner) == 10 and partner[4].text[0:5] == '持股比例':
+                stock_rate = partner_array[i].select('td')[8].text.replace('\n', '').replace(' ', '')
             if '%' in stock_rate:
                 stock_rate = stock_rate.split('%')[0]+'%'
             worksheet.write(start_row, 3, stock_rate, style)  # 将信息输入表格
@@ -81,6 +86,10 @@ def export_partners(data_list,workbook, is_new):
                 money = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
                 if money != '-':
                     money = money + partner[4].text[5:]
+            elif len(partner) == 10 and partner[5].text[0:5] =='认缴出资额':
+                money = partner_array[i].select('td')[9].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+                if money != '-':
+                    money = money + partner[5].text[5:]
             else:
                 money = '--'
             worksheet.write(start_row, 4, money, style)  # 将信息输入表格
@@ -95,6 +104,8 @@ def export_partners(data_list,workbook, is_new):
                 time = partner_array[i].select('td')[6].text.replace('\n', '').replace(' ', '').replace('<br>', '')
             elif len(partner) == 8 and partner[3].text[0:6] =='认缴出资日期':
                 time = partner_array[i].select('td')[7].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+            elif len(partner) == 10 and partner[6].text[0:6] =='认缴出资日期':
+                time = partner_array[i].select('td')[10].text.replace('\n', '').replace(' ', '').replace('<br>', '')
             else:
                 time = '--'
             worksheet.write(start_row, 5, time, style)  # 将信息输入表格
@@ -106,9 +117,13 @@ def export_partners(data_list,workbook, is_new):
                 if real_money != '-':
                     real_money=real_money+partner[5].text[5:]
             elif len(partner) == 8 and partner[6].text[0:5] =='实缴出资额':
-                real_money = partner_array[i].select('td')[8].text.replace('\n', '').replace(' ', '').replace('<br>', '')+partner[6].text[5:]
+                real_money = partner_array[i].select('td')[8].text.replace('\n', '').replace(' ', '').replace('<br>', '')
                 if real_money != '-':
                     real_money=real_money+partner[6].text[5:]
+            elif len(partner) == 10 and partner[7].text[0:5] =='实缴出资额':
+                real_money = partner_array[i].select('td')[11].text.replace('\n', '').replace(' ', '').replace('<br>', '')
+                if real_money != '-':
+                    real_money=real_money+partner[7].text[5:]
             else:
                 real_money = '--'
             worksheet.write(start_row, 6, real_money, style)  # 将信息输入表格
@@ -119,6 +134,8 @@ def export_partners(data_list,workbook, is_new):
                 real_time = partner_array[i].select('td')[8].text.replace('\n', '').replace(' ', '').replace('<br>','')
             elif len(partner) == 8 and partner[7].text =='实缴出资日期':
                 real_time = partner_array[i].select('td')[9].text.replace('\n', '').replace(' ', '').replace('<br>','')
+            elif len(partner) == 10 and partner[8].text =='实缴出资日期':
+                real_time = partner_array[i].select('td')[12].text.replace('\n', '').replace(' ', '').replace('<br>','')
             else:
                 real_time = '--'
             worksheet.write(start_row, 7, real_time, style)  # 将信息输入表格
