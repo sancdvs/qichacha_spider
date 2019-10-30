@@ -64,8 +64,12 @@ def export_excel(data, error_data):
             logging.exception(e)
     # 导出抓取失败企业名称
     if len(error_data) > 0:
-        print("==============================导出抓取失败企业==============================")
-        export_error_data(error_data, workbook, check_sheet_exsit(spider_result_file_name, error_data_sheet_name))
+        print("==============================写入抓取失败企业==============================")
+        try:
+            export_error_data(error_data, workbook, check_sheet_exsit(spider_result_file_name, error_data_sheet_name))
+        except Exception as e:
+            print('===================写入抓取失败企业异常===================')
+            logging.exception(e)
     workbook.save(spider_result_file_name)
 
 
