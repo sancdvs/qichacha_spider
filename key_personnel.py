@@ -2,7 +2,7 @@ import re
 
 from config import spider_result_file_name, key_personnel_sheet_name
 from excel_util import *
-
+from log import logging
 
 # 导出企业主要人员
 def export_key_personnel(data_list, workbook, is_exsit):
@@ -29,9 +29,9 @@ def export_key_personnel(data_list, workbook, is_exsit):
         order_number += 1
         # 公司名称
         company_name = _response.find(class_="row title jk-tip").select('h1')[0].text.replace('\n', '').replace(' ', '')
-        print('公司名称：' + company_name)
+        logging.info('公司名称：' + company_name)
         personnel_array = _response.select("#Mainmember > table > tr")  # 包含了标题tr
-        # print(personnel_array)
+        # logging.info(personnel_array)
         if len(personnel_array)-1 > 0:
             worksheet.write_merge(start_row, start_row + len(personnel_array)-2, 0, 0, order_number, style_merge)  # 合并序号单元格
             worksheet.write_merge(start_row, start_row + len(personnel_array)-2, 1, 1, company_name, style_merge)  # 合并公司名称单元格
@@ -46,12 +46,12 @@ def export_key_personnel(data_list, workbook, is_exsit):
                 # 姓名
                 if len(personnel_array[i].select('td')) > 1 and len(personnel_array[i].select('td')[1].select('h3')) > 0:
                     name = personnel_array[i].select('td')[1].select('h3')[0].text.replace('\n', '').replace(' ', '')
-                print('姓名：' + name)
+                logging.info('姓名：' + name)
                 worksheet.write(start_row, 2, name, style)  # 将信息输入表格
                 # 职务
                 if len(personnel_array[i].select('td')) > 2:
                     job = personnel_array[i].select('td')[2].text.replace('\n', '').replace(' ', '')
-                print('职务：' + job)
+                logging.info('职务：' + job)
                 worksheet.write(start_row, 3, job, style)  # 将信息输入表格
                 start_row += 1
 
@@ -62,9 +62,9 @@ def export_key_personnel(data_list, workbook, is_exsit):
         #     company_name = company_name[0].strip()
         # else:
         #     company_name = '--'
-        # print('公司名称：' + company_name)
+        # logging.info('公司名称：' + company_name)
         # personnel_list = re.findall('<a class="employee-item" href=".*?" style="display: block;">(\s*.*?\s*)</a>', _response)
-        # # print(personnel_list)
+        # # logging.info(personnel_list)
         # if len(personnel_list) > 0:
         #     worksheet.write_merge(start_row, start_row + len(personnel_list)-1, 0, 0, order_number, style_merge)  # 合并序号单元格
         #     worksheet.write_merge(start_row, start_row + len(personnel_list)-1, 1, 1, company_name, style_merge)  # 合并公司名称单元格
@@ -82,7 +82,7 @@ def export_key_personnel(data_list, workbook, is_exsit):
         #         name = name[0].strip()
         #     else:
         #         name = '--'
-        #     print('姓名：' + name)
+        #     logging.info('姓名：' + name)
         #     worksheet.write(start_row, 2, name, style)  # 将信息输入表格
         #     # 职务
         #     job = re.findall('<div class="employee-job">(\s*.*?\s*)</div>', personnel)
@@ -90,13 +90,13 @@ def export_key_personnel(data_list, workbook, is_exsit):
         #         job = job[0].strip()
         #     else:
         #         job = '--'
-        #     print('职务：' + job)
+        #     logging.info('职务：' + job)
         #     worksheet.write(start_row, 3, job, style)  # 将信息输入表格
         #     start_row += 1
-        # print('----------------------------------------------------------------------')
+        # logging.info('----------------------------------------------------------------------')
     return worksheet
 
 
 if __name__ == '__main__':
     for i in range(1, 4):
-        print(i)
+        logging.info(i)

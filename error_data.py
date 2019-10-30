@@ -2,7 +2,7 @@ import re
 
 from config import spider_result_file_name, error_data_sheet_name
 from excel_util import style_title, style, read_excel_rows, get_sheet_by_name
-
+from log import logging
 
 # 导出错误企业信息
 def export_error_data(error_data,workbook, is_exsit):
@@ -18,7 +18,7 @@ def export_error_data(error_data,workbook, is_exsit):
         worksheet = workbook.get_sheet(error_data_sheet_name)
 
     for company_name in error_data:
-        print('公司名称：{}'.format(company_name))
+        logging.info('公司名称：{}'.format(company_name))
         worksheet.write(start_row, 0, start_row, style)
         worksheet.write(start_row, 1, company_name, style)
         start_row += 1

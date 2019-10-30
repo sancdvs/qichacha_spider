@@ -1,7 +1,6 @@
 # encoding:utf-8
 # requests库用于爬取HTML页面，提交网络抓取
 import inspect
-import logging
 import os
 
 import openpyxl
@@ -30,6 +29,7 @@ from headers import get_headers, get_proxy_headers, generateCookie, cookies_loca
 from partners import export_partners
 from key_personnel import export_key_personnel
 from tools.myTimer import MyTimer
+from log import logging
 
 
 def export_excel(data, error_data):
@@ -42,34 +42,38 @@ def export_excel(data, error_data):
         workbook = xlwt.Workbook(encoding="utf-8")
     # 导出企业基本信息
     if len(data) > 0:
-        print("==============================企业基本信息==============================")
+        logging.info("==============================企业基本信息==============================")
         try:
             export_basic_inf(data, workbook, check_sheet_exsit(spider_result_file_name, basic_inf_sheet_name))
         except Exception as e:
-            print('===================写入企业基本信息异常===================')
-            logging.exception(e)
+            logging.error('===================写入企业基本信息异常===================')
+            # logging.exception(e)
+            logging.error(e)
         # 导出企业股东信息
-        print("==============================企业股东信息==============================")
+        logging.info("==============================企业股东信息==============================")
         try:
             export_partners(data, workbook, check_sheet_exsit(spider_result_file_name, partners_sheet_name))
         except Exception as e:
-            print('===================写入企业股东信息异常===================')
-            logging.exception(e)
+            logging.error('===================写入企业股东信息异常===================')
+            # logging.exception(e)
+            logging.error(e)
         # 导出企业主要人员s
-        print("==============================企业主要人员==============================")
+        logging.info("==============================企业主要人员==============================")
         try:
             export_key_personnel(data, workbook, check_sheet_exsit(spider_result_file_name, key_personnel_sheet_name))
         except Exception as e:
-            print('===================写入企业主要人员异常===================')
-            logging.exception(e)
+            logging.error('===================写入企业主要人员异常===================')
+            # logging.exception(e)
+            logging.error(e)
     # 导出抓取失败企业名称
     if len(error_data) > 0:
-        print("==============================写入抓取失败企业==============================")
+        logging.info("==============================写入抓取失败企业==============================")
         try:
             export_error_data(error_data, workbook, check_sheet_exsit(spider_result_file_name, error_data_sheet_name))
         except Exception as e:
-            print('===================写入抓取失败企业异常===================')
-            logging.exception(e)
+            logging.error('===================写入抓取失败企业异常===================')
+            logging.error(e)
+            # logging.exception(e)
     workbook.save(spider_result_file_name)
 
 
@@ -97,19 +101,21 @@ def verify(url):
 def retry_crawl(url, isProxy):
     response = None
     for i in range(spider_retry_num):
-        print('抓取异常！正在试图第{}次抓取页面{}'.format(i + 1, url))
+        logging.info('抓取异常！正在试图第{}次抓取页面{}'.format(i + 1, url))
         try:
             if isProxy:
                 proxy = _proxy()
-                print('正在使用代理{}，抓取页面 {}'.format(proxy, url))
+                logging.info('正在使用代理{}，抓取页面 {}'.format(proxy, url))
                 response = requests.get(url, headers=get_proxy_headers(proxy), proxies=proxy, timeout=spider_timeout)
             else:
                 response = requests.get(url, headers=get_headers(), timeout=spider_timeout)
         except requests.exceptions.ProxyError as e:
             # logging.exception(e)
+            logging.error(e)
             continue
         except requests.exceptions.ConnectTimeout as e:
             # logging.exception(e)
+            logging.error(e)
             continue
         soup = BeautifulSoup(response.text, 'lxml')
         com_all_info = soup.find_all(class_='m_srchList')
@@ -136,7 +142,7 @@ def remove_repeat(list):
         if '' != name and not name.isspace() and name not in list2:
             list2.append(name)
         elif '' != name and not name.isspace():
-            print('存在重复企业名称==========={}'.format(name))
+            logging.info('存在重复企业名称==========={}'.format(name))
     # print(list2)
     return list2
 
@@ -157,33 +163,33 @@ def get_detail_url(start_url, response,is_proxy):
             _com_all_info = _soup.find_all(class_='m_srchList')
             if len(_com_all_info) > 0:
                 search_url = _com_all_info[0].tbody.select('tr')[0].select('td')[2].select('a')[0].get('href')  # 取第一条数据
-    print("获取筛选信息链接=============={}".format(search_url))
+    logging.info("获取筛选信息链接=============={}".format(search_url))
     return search_url
 
 
 def readCookie():
-    print('正在读取cookie......')
+    logging.info('正在读取cookie......')
     f = open('cookie.txt', encoding='utf-8')
     cookies = f.readlines()
     for cookie in cookies:
         cookie = cookie.replace('\n', '').strip()
         cookies_local.append(cookie)
     if len(cookies_local) > 0:
-        print('读取到cookie=============={}个'.format(len(cookies_local)))
+        logging.info('读取到cookie=============={}个'.format(len(cookies_local)))
     else:
-        print('请保存登录企查查的cookie到cookie.txt文件中！')
+        logging.info('请保存登录企查查的cookie到cookie.txt文件中！')
         return
 
 
 if __name__ == '__main__':
-    print('>>>>>>>>>>>>>>>>>>>启动企查查爬虫程序>>>>>>>>>>>>>>>>>>>')
-    print('********************************************************')
-    print('本程序运行条件：')
-    print('1、请先确保本程序处于外网环境！')
-    print('2、为防止企查查网站反爬，每次程序运行间隔不少于30分钟！')
-    print('3、一次爬取企业数量建议不大于100条！')
-    print('4、程序执行过程中请勿关闭！')
-    print('********************************************************')
+    logging.info('>>>>>>>>>>>>>>>>>>>启动企查查爬虫程序>>>>>>>>>>>>>>>>>>>')
+    logging.info('********************************************************')
+    logging.info('本程序运行条件：')
+    logging.info('1、请先确保本程序处于外网环境！')
+    logging.info('2、为防止企查查网站反爬，每次程序运行间隔不少于30分钟！')
+    logging.info('3、一次爬取企业数量建议不大于100条！')
+    logging.info('4、程序执行过程中请勿关闭！')
+    logging.info('********************************************************')
 
     if is_internet():
         # 启动生成cookie定时任务
@@ -200,9 +206,9 @@ if __name__ == '__main__':
             # 打开企业搜索文件
             f = open(enterprise_search_file, encoding='utf-8')
             enterprise_list = f.readlines()
-            print('开始对文件进行重复检查......')
+            logging.info('开始对文件进行重复检查......')
             _enterprise_list = remove_repeat(enterprise_list)
-            print('去除重复后企业总数============={}'.format(len(_enterprise_list)))
+            logging.info('去除重复后企业总数============={}'.format(len(_enterprise_list)))
             f.close()
             # 增加重试连接次数
             requests.adapters.DEFAULT_RETRIES = 5
@@ -215,7 +221,7 @@ if __name__ == '__main__':
                     try:
                         _proxy()
                     except Exception as e:
-                        print('========================请先启动ip代理程序=======================')
+                        logging.info('========================请先启动ip代理程序=======================')
                         break
                 # 定义查询结果集
                 data_list = []
@@ -225,10 +231,10 @@ if __name__ == '__main__':
                 start_url = base_url + str(name)
                 # print(start_url)
                 try:
-                    print("正在抓取第{}个公司==========================={}".format(i, name))
+                    logging.info("正在抓取第{}个公司==========================={}".format(i, name))
                     if is_proxy:
                         proxy = _proxy()
-                        print('正在使用代理{}，抓取页面 {}'.format(proxy, start_url))
+                        logging.info('正在使用代理{}，抓取页面 {}'.format(proxy, start_url))
                         try:
                             response = requests.get(start_url, headers=get_proxy_headers(proxy), proxies=proxy, timeout=spider_timeout)
                         except Exception as e:
@@ -257,7 +263,7 @@ if __name__ == '__main__':
 
                     if is_proxy:
                         proxy = _proxy()
-                        print('正在使用代理{}，抓取页面 {}'.format(proxy, url))
+                        logging.info('正在使用代理{}，抓取页面 {}'.format(proxy, url))
                         try:
                             response1 = requests.get(url, headers=get_proxy_headers(proxy), proxies=proxy, timeout=spider_timeout)
                         except Exception as e:
@@ -274,17 +280,18 @@ if __name__ == '__main__':
                     _response1 = response1.text
                     _soup = BeautifulSoup(_response1, 'lxml')
                     data_list.append(_soup)
-                    print("{}=============抓取成功！".format(name))
+                    logging.info("{}=============抓取成功！".format(name))
                 except Exception as e:
-                    print(name + '=========================抓取该公司的信息异常')
+                    logging.error(name + '=========================抓取该公司的信息异常')
                     error_data_list.append(name)
+                    logging.error(e)
                     # print(str(e))
-                    logging.exception(e)
+                    # logging.exception(e)
                 # 导出excel
                 if len(data_list) > 0 or len(error_data_list) > 0:
-                    print('==================正在写入excel文件，请勿关闭程序！==================')
+                    logging.info('==================正在写入excel文件，请勿关闭程序！==================')
                     export_excel(data_list, error_data_list)
                 time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))  # 每隔5到20秒
     else:
-        print('====================本程序只能在外网环境下运行====================')
+        logging.info('====================本程序只能在外网环境下运行====================')
     input('按任意键回车退出：')

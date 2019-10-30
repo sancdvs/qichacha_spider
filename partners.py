@@ -2,7 +2,7 @@ import re
 
 from config import spider_result_file_name, partners_sheet_name
 from excel_util import style_title, style_merge, style, read_excel_rows, get_merged_cells_value, get_sheet_by_name
-
+from log import logging
 
 # 导出企业股东信息
 def export_partners(data_list,workbook, is_exsit):
@@ -39,7 +39,7 @@ def export_partners(data_list,workbook, is_exsit):
         order_number += 1
         # 公司名称
         company_name = _response.find(class_="row title jk-tip").select('h1')[0].text.replace('\n', '').replace(' ', '')
-        print('公司名称：' + company_name)
+        logging.info('公司名称：' + company_name)
 
         partner_array = _response.select("#partnerslist > table > tr")
         if len(partner_array) == 0:
@@ -63,7 +63,7 @@ def export_partners(data_list,workbook, is_exsit):
         if len(partner_array) > 0:
             partner_th = [data for data in partner_array[0].children if data != ' '][1:]  # 股东表格的标题行th,去除序号th
             partner_tbale_th = [th.text.replace('\n', '').replace(' ', '') for th in partner_th]
-            # print('表格标题行=========={}'.format(partner_tbale_th))
+            # logging.info('表格标题行=========={}'.format(partner_tbale_th))
 
         for i in range(1, len(partner_array)):
             partner_row = [data for data in partner_array[i].children if data != ' '][1:]   # 数据行，排除序号列td
@@ -77,11 +77,11 @@ def export_partners(data_list,workbook, is_exsit):
                     v = partner_row[j].text.replace('\n', '').replace(' ', '').replace('持股详情>', '')
                     if '-' != v:
                         v += unit
-                    print(partner_title[index[0]]+'：'+v)
+                    logging.info(partner_title[index[0]]+'：'+v)
                     worksheet.write(start_row, index[0], v, style)  # 将信息输入表格
                 elif len(partner_row[j].select('h3')) > 0:
                     partner_name = partner_row[j].select('h3')[0].text.replace('\n', '').replace(' ', '')
-                    print('股东名称：' + partner_name)
+                    logging.info('股东名称：' + partner_name)
                     worksheet.write(start_row, 2, partner_name, style)  # 将信息输入表格
             start_row += 1
             # #股东及出资信息
@@ -89,7 +89,7 @@ def export_partners(data_list,workbook, is_exsit):
             # if len(partner_array[i].select('td')) > 1 and len(partner_array[i].select('td')[1].select('h3')) > 0:
             #     partner_name = partner_array[i].select('td')[1].select('h3')[0].text.replace('\n', '').replace(' ', '')
             # worksheet.write(start_row, 2, partner_name, style)  # 将信息输入表格
-            # print('股东名称：' + partner_name)
+            # logging.info('股东名称：' + partner_name)
             #
             # #持股比例
             # stock_rate= partner_array[i].select('td')[4].text.replace('\n', '').replace(' ', '')
@@ -98,7 +98,7 @@ def export_partners(data_list,workbook, is_exsit):
             # if '%' in stock_rate:
             #     stock_rate = stock_rate.split('%')[0]+'%'
             # worksheet.write(start_row, 3, stock_rate, style)  # 将信息输入表格
-            # print('持股比例：' + stock_rate)
+            # logging.info('持股比例：' + stock_rate)
             #
             # # 认缴出资额(万元)
             # if len(partner) == 5 and partner[3].text[0:5] =='认缴出资额':
@@ -124,7 +124,7 @@ def export_partners(data_list,workbook, is_exsit):
             # else:
             #     money = '--'
             # worksheet.write(start_row, 4, money, style)  # 将信息输入表格
-            # print('认缴出资额：' + money)
+            # logging.info('认缴出资额：' + money)
             #
             # #认缴出资日期
             # if len(partner) == 5 and partner[3].text[0:6] =='认缴出资日期':
@@ -140,7 +140,7 @@ def export_partners(data_list,workbook, is_exsit):
             # else:
             #     time = '--'
             # worksheet.write(start_row, 5, time, style)  # 将信息输入表格
-            # print('认缴出资日期：' + time)
+            # logging.info('认缴出资日期：' + time)
             #
             # #实缴出资额(万元)
             # if len(partner) == 7 and partner[5].text[0:5] =='实缴出资额':
@@ -158,7 +158,7 @@ def export_partners(data_list,workbook, is_exsit):
             # else:
             #     real_money = '--'
             # worksheet.write(start_row, 6, real_money, style)  # 将信息输入表格
-            # print('实缴出资额：' + real_money)
+            # logging.info('实缴出资额：' + real_money)
             #
             # #实缴出资日期
             # if len(partner) == 7  and partner[6].text =='实缴出资日期' :
@@ -170,7 +170,7 @@ def export_partners(data_list,workbook, is_exsit):
             # else:
             #     real_time = '--'
             # worksheet.write(start_row, 7, real_time, style)  # 将信息输入表格
-            # print('实缴出日期：' + real_time)
+            # logging.info('实缴出日期：' + real_time)
             # start_row += 1
 
             # 公司名称
@@ -179,11 +179,11 @@ def export_partners(data_list,workbook, is_exsit):
             #     company_name = company_name[0].strip()
             # else:
             #     company_name = '--'
-            # print('公司名称：' + company_name)
-            # print(_response)
+            # logging.info('公司名称：' + company_name)
+            # logging.info(_response)
             # list = re.findall('<div class="stock-item">(.*?\s*\n*.*?\s*\n*.*?\s*\n*)</div>\n?\s*</div>\n?\s*</div>\n?\s*</div>', _response)
             # for partner in list:
-            # print(partner)
+            # logging.info(partner)
             # partner_list = re.findall('<div class="stock-text">(.*?\s*)<', partner)
             # #股东名称
             # partner_name = re.findall(' <div class="stock-title"> <span > <a class="text-blue a-decoration"( href=".*?")? >(.*?\s*)</a>', partner)
@@ -191,38 +191,38 @@ def export_partners(data_list,workbook, is_exsit):
             #     partner_name = partner_name[0][1].strip()
             # else:
             #     partner_name = '--'
-            # print('股东名称：' + partner_name)
+            # logging.info('股东名称：' + partner_name)
             # worksheet.write(start_row, 2, partner_name,style)  # 将信息输入表格
             # if len(partner_list) > 0:
             #     #持股比例
             #     stock_rate = partner_list[0].strip()
             # else:
             #     stock_rate = '--'
-            # print('持股比例：' + stock_rate)
+            # logging.info('持股比例：' + stock_rate)
             # worksheet.write(start_row, 3, stock_rate,style)  # 将信息输入表格
             # if len(partner_list) > 1:
             #     #股东类型
             #     stock_type = partner_list[1].strip()
             # else:
             #     stock_type = '--'
-            # print('股东类型：' + stock_type)
+            # logging.info('股东类型：' + stock_type)
             # worksheet.write(start_row, 4, stock_type,style)  # 将信息输入表格
             # if len(partner_list) > 2:
             #     #认缴出资额(万元)
             #     money = partner_list[2].strip()
             # else:
             #     money = '--'
-            # print('认缴出资额(万元)：' + money)
+            # logging.info('认缴出资额(万元)：' + money)
             # worksheet.write(start_row, 5, money,style)  # 将信息输入表格
             # if len(partner_list) > 3:
             #     #认缴出资日期
             #     time = partner_list[3].strip()
             # else:
             #     time = '--'
-            # print('认缴出资日期：' + time)
+            # logging.info('认缴出资日期：' + time)
             # worksheet.write(start_row, 6, time,style)  # 将信息输入表格
             # start_row += 1
-        # print('----------------------------------------------------------------------')
+        # logging.info('----------------------------------------------------------------------')
     return worksheet
 
 if __name__ == '__main__':
@@ -240,7 +240,7 @@ if __name__ == '__main__':
    # list = re.findall(
    # '<div class="stock-item"> <div class="stock-title"> <span > <a class="text-blue a-decoration"( href=".*?")? >(\n*\s*.*?\s*\n*)</div>\n*\s*</div>\n*\s*</div>\n*\s*</div>', _response)
 
-   print(list)
+   logging.info(list)
 
    # _response1 =  '''
    # <div id="partners" class="content-block"> <div class="block-title">
@@ -249,4 +249,4 @@ if __name__ == '__main__':
    #                                      </div> </div> </div> </div> </div> </div> </div> </div>
    # '''
    # list1 = re.findall('<div class="stock-item">(.*\s*\n*.*\s*\n*.*\s*\n*)</div>\n?\s*</div>\n?\s*</div>\n?\s*</div>', _response1)
-   # print(list1)
+   # logging.info(list1)
