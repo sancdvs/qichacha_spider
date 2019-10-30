@@ -248,7 +248,7 @@ if __name__ == '__main__':
                         search_url = get_detail_url(start_url, response, is_proxy)
                         if search_url is None:
                             # print('请求企查查网站操作频繁，被反爬拦截了，需等待一段时间再试！')
-                            error_data_list.append(name)
+                            # error_data_list.append(name)
                             # break
                             raise RuntimeError('请求企查查网站操作频繁，被反爬拦截了，需等待一段时间再试！')
                     url = base_url1 + search_url
