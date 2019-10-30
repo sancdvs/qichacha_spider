@@ -1,15 +1,15 @@
 import re
 
-from config import spider_result_file_name
+from config import spider_result_file_name, key_personnel_sheet_name
 from excel_util import *
 
 
 # 导出企业主要人员
-def export_key_personnel(data_list, workbook, is_new):
+def export_key_personnel(data_list, workbook, is_exsit):
     start_row = 1  # 数据起始excel行号
     order_number = 0  # 数据起始序号
-    if is_new:
-        worksheet = workbook.add_sheet("主要人员", cell_overwrite_ok=True)
+    if not is_exsit:
+        worksheet = workbook.add_sheet(key_personnel_sheet_name, cell_overwrite_ok=True)
         worksheet.write(0, 0, "序号", style_title)
         worksheet.write(0, 1, "公司名称", style_title)
         worksheet.write(0, 2, "姓名", style_title)
@@ -21,8 +21,8 @@ def export_key_personnel(data_list, workbook, is_new):
             else:
                 worksheet.col(i).width = 256 * 20
     else:
-        start_row = read_excel_rows(spider_result_file_name, 2)
-        worksheet = workbook.get_sheet(2)
+        start_row = read_excel_rows(spider_result_file_name, key_personnel_sheet_name)
+        worksheet = get_sheet_by_name(workbook,key_personnel_sheet_name)
         order_number = int(get_merged_cells_value(spider_result_file_name, 2, start_row - 1, 0))  # 序号位置是第一列
 
     for _response in data_list:

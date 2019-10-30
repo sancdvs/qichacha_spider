@@ -21,9 +21,10 @@ from xlutils.copy import copy
 
 from basic_info import export_basic_inf
 from config import base_url, base_url1, enterprise_search_file, spider_timeout, spider_retry_num, cookie_interval_time, \
-    spider_result_file_name, crawl_interval_mintime, crawl_interval_maxtime, chrome_driver
+    spider_result_file_name, crawl_interval_mintime, crawl_interval_maxtime, chrome_driver, basic_inf_sheet_name, \
+    partners_sheet_name, key_personnel_sheet_name, error_data_sheet_name
 from error_data import export_error_data
-from excel_util import check_file
+from excel_util import check_file, check_sheet_exsit
 from proxy_ip import _proxy, is_internet
 from headers import get_headers, get_proxy_headers, generateCookie, cookies_local
 from partners import export_partners
@@ -32,11 +33,9 @@ from tools.myTimer import MyTimer
 
 
 def export_excel(data, error_data):
-    is_new = True
     if check_file(spider_result_file_name):
         old_workbook = xlrd.open_workbook(spider_result_file_name, formatting_info=True)
         workbook = copy(old_workbook)  # 拷贝一份原来的excel
-        is_new = False
     else:
         # 创建输出excel文件
         workbook = xlwt.Workbook(encoding="utf-8")
@@ -44,28 +43,28 @@ def export_excel(data, error_data):
     if len(data) > 0:
         print("==============================企业基本信息==============================")
         try:
-            export_basic_inf(data, workbook, is_new)
+            export_basic_inf(data, workbook, check_sheet_exsit(spider_result_file_name, basic_inf_sheet_name))
         except Exception as e:
             print('===================写入企业基本信息异常===================')
             logging.exception(e)
         # 导出企业股东信息
         print("==============================企业股东信息==============================")
         try:
-            export_partners(data, workbook, is_new)
+            export_partners(data, workbook, check_sheet_exsit(spider_result_file_name, partners_sheet_name))
         except Exception as e:
             print('===================写入企业股东信息异常===================')
             logging.exception(e)
         # 导出企业主要人员s
         print("==============================企业主要人员==============================")
         try:
-            export_key_personnel(data, workbook, is_new)
+            export_key_personnel(data, workbook, check_sheet_exsit(spider_result_file_name, key_personnel_sheet_name))
         except Exception as e:
             print('===================写入企业主要人员异常===================')
             logging.exception(e)
     # 导出抓取失败企业名称
     if len(error_data) > 0:
         print("==============================导出抓取失败企业==============================")
-        export_error_data(error_data, workbook, is_new)
+        export_error_data(error_data, workbook, check_sheet_exsit(spider_result_file_name, error_data_sheet_name))
     workbook.save(spider_result_file_name)
 
 
@@ -144,6 +143,8 @@ def get_detail_url(start_url, response,is_proxy):
     com_all_info = soup.find_all(class_='m_srchList')
     if len(com_all_info) > 0:
         search_url = com_all_info[0].tbody.select('tr')[0].select('td')[2].select('a')[0].get('href')  # 取第一条数据
+    elif len(soup.find_all(class_='noresult')) > 0:
+        raise RuntimeError('没有找到该企业！')
     else:
         _response = retry_crawl(start_url, is_proxy)
         if _response is not None:
@@ -200,7 +201,7 @@ if __name__ == '__main__':
             print('开始对文件进行重复检查......')
             _enterprise_list = remove_repeat(enterprise_list)
             print('去除重复后企业总数============={}'.format(len(_enterprise_list)))
-
+            f.close()
             # 增加重试连接次数
             requests.adapters.DEFAULT_RETRIES = 5
             # 关闭多余的连接
@@ -235,18 +236,19 @@ if __name__ == '__main__':
                             response = requests.get(start_url, headers=get_headers(), timeout=spider_timeout)
                         except Exception as e:
                             response = retry_crawl(start_url, is_proxy)
-                    if response.status_code != 200:
-                        error_data_list.append(name)
-                        print("抓取页面 {}，异常 {} 可能被企查查网站反爬拦截了！".format(start_url, response.status_code))
-                        continue
+                    # if response.status_code != 200:
+                    #     error_data_list.append(name)
+                    #     print("抓取页面 {}，异常 {} 可能被企查查网站反爬拦截了！".format(start_url, response.status_code))
+                    #     continue
 
                     # 获取企业筛选信息链接
                     if response is not None:
                         search_url = get_detail_url(start_url, response, is_proxy)
                         if search_url is None:
-                            print('请求企查查网站操作频繁，被反爬拦截了，需等待一段时间再试！')
+                            # print('请求企查查网站操作频繁，被反爬拦截了，需等待一段时间再试！')
                             error_data_list.append(name)
-                            break
+                            # break
+                            raise RuntimeError('请求企查查网站操作频繁，被反爬拦截了，需等待一段时间再试！')
                     url = base_url1 + search_url
 
                     time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))  # 间隔一段时间
@@ -263,10 +265,10 @@ if __name__ == '__main__':
                             response1 = requests.get(url, headers=get_headers(), timeout=spider_timeout)
                         except Exception as e:
                             response1 = retry_crawl(url, is_proxy)
-                    if response1.status_code != 200:
-                        print("抓取页面 {}，异常 {} 可能被企查查网站反爬拦截了！".format(url, response1.status_code))
-                        error_data_list.append(name)
-                        continue
+                    # if response1.status_code != 200:
+                    #     print("抓取页面 {}，异常 {} 可能被企查查网站反爬拦截了！".format(url, response1.status_code))
+                    #     error_data_list.append(name)
+                    #     continue
                     _response1 = response1.text
                     _soup = BeautifulSoup(_response1, 'lxml')
                     data_list.append(_soup)
@@ -276,13 +278,11 @@ if __name__ == '__main__':
                     error_data_list.append(name)
                     # print(str(e))
                     logging.exception(e)
-                    continue
                 # 导出excel
                 if len(data_list) > 0 or len(error_data_list) > 0:
                     print('==================正在写入excel文件，请勿关闭程序！==================')
                     export_excel(data_list, error_data_list)
                 time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))  # 每隔5到20秒
-            f.close()
     else:
         print('====================本程序只能在外网环境下运行====================')
     input('按任意键回车退出：')

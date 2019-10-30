@@ -35,3 +35,11 @@ chrome_driver = r'\chromedriver_win32\chromedriver.exe'
 log_dir = r'\logs'
 # 抓取结果文件路径
 spider_result_file_name = os.path.join(os.getcwd(), '企业抓取信息.xls')
+# 抓取结果文件企业基本信息sheet名称
+basic_inf_sheet_name = '基本信息'
+# 抓取结果文件企业股东信息sheet名称
+partners_sheet_name = '股东信息'
+# 抓取结果文件企业主要人员sheet名称
+key_personnel_sheet_name = '主要人员'
+# 抓取结果文件抓取失败sheet名称
+error_data_sheet_name = '抓取失败企业信息'

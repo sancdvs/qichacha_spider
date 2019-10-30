@@ -1,14 +1,14 @@
 import re
 
-from config import spider_result_file_name
+from config import spider_result_file_name, basic_inf_sheet_name
 from excel_util import *
 
 
 # 导出企业基本信息
-def export_basic_inf(data_list, workbook, is_new):
+def export_basic_inf(data_list, workbook, is_exsit):
     start_row = 1   # 数据起始excel行号
-    if is_new:
-        worksheet = workbook.add_sheet("基本信息", cell_overwrite_ok=True)
+    if not is_exsit:
+        worksheet = workbook.add_sheet(basic_inf_sheet_name, cell_overwrite_ok=True)
         worksheet.write(0, 0, "序号", style_title)
         worksheet.write(0, 1, "公司名称", style_title)
         worksheet.write(0, 2, "法定代表人", style_title)
@@ -48,8 +48,8 @@ def export_basic_inf(data_list, workbook, is_new):
             else:
                 worksheet.col(i).width = 256 * 20
     else:
-        start_row = read_excel_rows(spider_result_file_name,0)
-        worksheet = workbook.get_sheet(0)
+        start_row = read_excel_rows(spider_result_file_name,basic_inf_sheet_name)
+        worksheet = get_sheet_by_name(workbook,basic_inf_sheet_name)
 
     for _response in data_list:
         worksheet.write(start_row, 0, start_row, style)

@@ -1,14 +1,15 @@
 import re
 
-from config import spider_result_file_name
-from excel_util import style_title, style_merge, style, read_excel_rows, get_merged_cells_value
+from config import spider_result_file_name, partners_sheet_name
+from excel_util import style_title, style_merge, style, read_excel_rows, get_merged_cells_value, get_sheet_by_name
+
 
 # 导出企业股东信息
-def export_partners(data_list,workbook, is_new):
+def export_partners(data_list,workbook, is_exsit):
     start_row = 1   # 数据起始excel行号
     order_number = 0    # 数据起始序号
-    if is_new:
-        worksheet = workbook.add_sheet("股东信息",cell_overwrite_ok=True)
+    if not is_exsit:
+        worksheet = workbook.add_sheet(partners_sheet_name,cell_overwrite_ok=True)
         worksheet.write(0, 0, u"序号", style_title)
         worksheet.write(0, 1, u"公司名称", style_title)
         worksheet.write(0, 2, u"股东名称", style_title)
@@ -27,8 +28,8 @@ def export_partners(data_list,workbook, is_new):
         worksheet.col(6).width = 256 * 30
         worksheet.col(7).width = 256 * 30
     else:
-        start_row = read_excel_rows(spider_result_file_name, 1)
-        worksheet = workbook.get_sheet(1)
+        start_row = read_excel_rows(spider_result_file_name, partners_sheet_name)
+        worksheet = get_sheet_by_name(workbook,partners_sheet_name)
         order_number = int(get_merged_cells_value(spider_result_file_name, 1, start_row-1, 0))  # 序号位置是第一列
 
     # 定义excel表头列表

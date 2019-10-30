@@ -84,16 +84,21 @@ def len_byte(value):
     length = (utf8_length - length) / 2 + length
     return int(length)
 
+
 # 读取excel行数
-def read_excel_rows(filePath,sheetindex):
-    # 打开文件
-    x1 = xlrd.open_workbook(filePath)
-    # 获取sheet的汇总数据
-    sheet = x1.sheet_by_index(sheetindex)
-    # print("sheet name:{}".format(sheet.name))  # get sheet name
-    # print("row num:{}".format(sheet.nrows))  # get sheet all rows number
-    # print("col num:{}".format(sheet.ncols))  # get sheet all columns number
-    return sheet.nrows
+def read_excel_rows(filePath,sheet_name):
+    if check_sheet_exsit(filePath, sheet_name):
+        # 打开文件
+        x1 = xlrd.open_workbook(filePath)
+        sheet_array = [sheet for sheet in x1.get_sheets() if sheet_name in sheet.name]
+        if len(sheet_array) > 0:
+            return sheet_array[0].nrows
+        # 获取sheet的汇总数据
+        # sheet = x1.sheet_by_index(sheetindex)
+        # print("sheet name:{}".format(sheet.name))  # get sheet name
+        # print("row num:{}".format(sheet.nrows))  # get sheet all rows number
+        # print("col num:{}".format(sheet.ncols))  # get sheet all columns number
+        # return sheet.nrows
 
 
 # 判断文件是否存在
@@ -102,6 +107,33 @@ def check_file(filePath):
     # print(os.path.isfile(filePath)) # 是否是文件
     # print(os.access(filePath, os.W_OK)) # 检查文件是否可以写入
     return os.path.exists(filePath) and os.access(filePath, os.W_OK)
+
+
+# 判断excel文件中的sheet是否存在
+def check_sheet_exsit(filePath,sheet_name):
+    if check_file(filePath):
+        # 打开文件
+        x1 = xlrd.open_workbook(filePath)
+        sheet_name_array = [name for name in x1.sheet_names()]
+        return sheet_name in sheet_name_array
+    return False
+
+
+# 获取sheet在excel文件中的索引位置
+def get_sheet_index(filePath,sheet_name):
+    if check_sheet_exsit(filePath,sheet_name):
+        # 打开文件
+        x1 = xlrd.open_workbook(filePath)
+        index = [k for k, x in enumerate(x1.sheet_names()) if sheet_name in x]
+        if len(index) > 0:
+            return index[0]
+
+
+# 根据名称获取sheet
+def get_sheet_by_name(workbook,sheet_name):
+    sheet_array = [sheet for sheet in workbook.get_sheets() if sheet_name in sheet.name]
+    if len(sheet_array) > 0:
+        return sheet_array[0]
 
 
 # 获取工作簿中所有的合并单元格
