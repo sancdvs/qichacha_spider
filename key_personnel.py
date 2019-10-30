@@ -22,8 +22,8 @@ def export_key_personnel(data_list, workbook, is_exsit):
                 worksheet.col(i).width = 256 * 20
     else:
         start_row = read_excel_rows(spider_result_file_name, key_personnel_sheet_name)
-        worksheet = get_sheet_by_name(workbook,key_personnel_sheet_name)
-        order_number = int(get_merged_cells_value(spider_result_file_name, 2, start_row - 1, 0))  # 序号位置是第一列
+        worksheet = workbook.get_sheet(key_personnel_sheet_name)
+        order_number = int(get_merged_cells_value(spider_result_file_name,key_personnel_sheet_name, start_row - 1, 0))  # 序号位置是第一列
 
     for _response in data_list:
         order_number += 1

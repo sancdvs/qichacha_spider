@@ -87,12 +87,17 @@ def len_byte(value):
 
 # 读取excel行数
 def read_excel_rows(filePath,sheet_name):
-    if check_sheet_exsit(filePath, sheet_name):
+    if check_file(filePath):
         # 打开文件
-        x1 = xlrd.open_workbook(filePath)
-        sheet_array = [sheet for sheet in x1.get_sheets() if sheet_name in sheet.name]
-        if len(sheet_array) > 0:
-            return sheet_array[0].nrows
+        workbook = xlrd.open_workbook(filePath)
+        sheet = workbook.sheet_by_name(sheet_name)
+        return sheet.nrows
+        # for sheet in workbook.sheets():
+        #     if sheet_name in sheet.name:
+        #         return sheet.nrows
+        # sheet_array = [sheet for sheet in workbook.get_sheets() if sheet_name in sheet.name]
+        # if len(sheet_array) > 0:
+        #     return sheet_array[0].nrows
         # 获取sheet的汇总数据
         # sheet = x1.sheet_by_index(sheetindex)
         # print("sheet name:{}".format(sheet.name))  # get sheet name
@@ -113,15 +118,21 @@ def check_file(filePath):
 def check_sheet_exsit(filePath,sheet_name):
     if check_file(filePath):
         # 打开文件
-        x1 = xlrd.open_workbook(filePath)
-        sheet_name_array = [name for name in x1.sheet_names()]
-        return sheet_name in sheet_name_array
-    return False
+        workbook = xlrd.open_workbook(filePath)
+        try:
+            workbook.sheet_by_name(sheet_name)
+            return True
+        except xlrd.biffh.XLRDError as e:
+            return False
+        # sheet_name_array = [name for name in workbook.sheet_names()]
+        # return sheet_name in sheet_name_array
+    else:
+        return False
 
 
 # 获取sheet在excel文件中的索引位置
 def get_sheet_index(filePath,sheet_name):
-    if check_sheet_exsit(filePath,sheet_name):
+    if check_file(filePath):
         # 打开文件
         x1 = xlrd.open_workbook(filePath)
         index = [k for k, x in enumerate(x1.sheet_names()) if sheet_name in x]
@@ -130,10 +141,17 @@ def get_sheet_index(filePath,sheet_name):
 
 
 # 根据名称获取sheet
-def get_sheet_by_name(workbook,sheet_name):
-    sheet_array = [sheet for sheet in workbook.get_sheets() if sheet_name in sheet.name]
-    if len(sheet_array) > 0:
-        return sheet_array[0]
+def get_sheet_by_name(filePath,sheet_name):
+    if check_file(filePath):
+        # 打开文件
+        workbook = xlrd.open_workbook(filePath,formatting_info=True)
+        try:
+            return workbook.sheet_by_name(sheet_name)
+        except xlrd.biffh.XLRDError as e:
+            return None
+        # sheet_array = [sheet for sheet in workbook.get_sheets() if sheet_name in sheet.name]
+        # if len(sheet_array) > 0:
+        #     return sheet_array[0]
 
 
 # 获取工作簿中所有的合并单元格
@@ -149,7 +167,7 @@ def get_merged_cells(sheet):
 
 
 # 获取合并单元格的值
-def get_merged_cells_value(filePath, sheetindex, row_index, col_index):
+def get_merged_cells_value(filePath,sheet_name, row_index, col_index):
     """
     先判断给定的单元格，是否属于合并单元格；
     如果是合并单元格，就返回合并单元格的内容
@@ -158,18 +176,20 @@ def get_merged_cells_value(filePath, sheetindex, row_index, col_index):
     is_merged_cell = False
     cell_value = None
     # 打开文件
-    # 读取文件的时候需要将formatting_info参数设置为True，默认是False，不然上面获取合并的单元格数组为空
-    x1 = xlrd.open_workbook(filePath,formatting_info=True)
+    # 读取文件的时候需要将formatting_info参数设置为True，默认是False，不然获取合并的单元格数组为空
+    # x1 = xlrd.open_workbook(filePath,formatting_info=True)
     # 获取sheet的汇总数据
-    sheet = x1.sheet_by_index(sheetindex)
-    merged = get_merged_cells(sheet)
-    for (rlow, rhigh, clow, chigh) in merged:
-        if (row_index >= rlow and row_index < rhigh):
-            if (col_index >= clow and col_index < chigh):
-                cell_value = sheet.cell_value(rlow, clow)
-                is_merged_cell = True
-                # print('该单元格[%d,%d]属于合并单元格，值为[%s]' % (row_index, col_index, cell_value))
-                break
+    # sheet = x1.sheet_by_index(sheetindex)
+    sheet = get_sheet_by_name(filePath,sheet_name)
+    if sheet is not None:
+        merged = get_merged_cells(sheet)
+        for (rlow, rhigh, clow, chigh) in merged:
+            if (row_index >= rlow and row_index < rhigh):
+                if (col_index >= clow and col_index < chigh):
+                    cell_value = sheet.cell_value(rlow, clow)
+                    is_merged_cell = True
+                    # print('该单元格[%d,%d]属于合并单元格，值为[%s]' % (row_index, col_index, cell_value))
+                    break
     if not is_merged_cell:
         cell_value = sheet.cell_value(row_index, col_index)
     return cell_value
@@ -182,10 +202,10 @@ if __name__ == '__main__':
     # print(check_file(filePath))
     # print(read_excel_rows(filePath))
     # xlutils:修改excel
-    # book1 = xlrd.open_workbook(filePath,formatting_info=True)
-    # book2 = copy(book1)  # 拷贝一份原来的excel
-    # # print(dir(book2))
-    # sheet = book2.get_sheet(0)  # 获取第几个sheet页，book2现在的是xlutils里的方法，不是xlrd的
+    book1 = xlrd.open_workbook(filePath,formatting_info=True)
+    book2 = copy(book1)  # 拷贝一份原来的excel
+    # print(dir(book2))
+    sheet = book2.get_sheet(0)  # 获取第几个sheet页，book2现在的是xlutils里的方法，不是xlrd的
     # sheet.write(763, 0, 763,style)
     # sheet.write(763, 1, 'ss',style)
     # sheet.get

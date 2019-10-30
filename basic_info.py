@@ -49,7 +49,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
                 worksheet.col(i).width = 256 * 20
     else:
         start_row = read_excel_rows(spider_result_file_name,basic_inf_sheet_name)
-        worksheet = get_sheet_by_name(workbook,basic_inf_sheet_name)
+        worksheet = workbook.get_sheet(basic_inf_sheet_name)
 
     for _response in data_list:
         worksheet.write(start_row, 0, start_row, style)

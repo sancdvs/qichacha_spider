@@ -34,6 +34,7 @@ from tools.myTimer import MyTimer
 
 def export_excel(data, error_data):
     if check_file(spider_result_file_name):
+        # 读取文件的时候需要将formatting_info参数设置为True，默认是False；保留样式，不然获取合并的单元格数组为空
         old_workbook = xlrd.open_workbook(spider_result_file_name, formatting_info=True)
         workbook = copy(old_workbook)  # 拷贝一份原来的excel
     else:
@@ -190,10 +191,7 @@ if __name__ == '__main__':
         if 'y' == is_ok.lower():
             is_proxy = 'n'
             # is_proxy = input("是否启用ip代理y/n？：")
-            if is_proxy == 'y':
-                is_proxy = True
-            else:
-                is_proxy = False
+            is_proxy = True if is_proxy == 'y' else False
             readCookie()    # 从文件中读取cookie
             # 打开企业搜索文件
             f = open(enterprise_search_file, encoding='utf-8')

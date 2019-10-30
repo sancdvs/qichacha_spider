@@ -29,8 +29,8 @@ def export_partners(data_list,workbook, is_exsit):
         worksheet.col(7).width = 256 * 30
     else:
         start_row = read_excel_rows(spider_result_file_name, partners_sheet_name)
-        worksheet = get_sheet_by_name(workbook,partners_sheet_name)
-        order_number = int(get_merged_cells_value(spider_result_file_name, 1, start_row-1, 0))  # 序号位置是第一列
+        worksheet = workbook.get_sheet(partners_sheet_name)
+        order_number = int(get_merged_cells_value(spider_result_file_name,partners_sheet_name, start_row-1, 0))  # 序号位置是第一列
 
     # 定义excel表头列表
     partner_title = ['序号', '公司名称', '股东名称', '持股比例', '认缴出资额', '认缴出资日期', '实缴出资额', '实缴出资日期']
