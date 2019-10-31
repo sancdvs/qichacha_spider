@@ -18,7 +18,7 @@ def export_error_data(error_data,workbook, is_exsit):
         worksheet = workbook.get_sheet(error_data_sheet_name)
 
     for company_name in error_data:
-        logging.info('公司名称：{}'.format(company_name))
+        print('公司名称：{}'.format(company_name))
         worksheet.write(start_row, 0, start_row, style)
         worksheet.write(start_row, 1, company_name, style)
         start_row += 1

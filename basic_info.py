@@ -55,7 +55,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
         worksheet.write(start_row, 0, start_row, style)
         # 公司名称
         company_name = _response.find(class_="row title jk-tip").select('h1')[0].text.replace('\n', '').replace(' ', '')
-        logging.info('公司名称：' + company_name)
+        print('公司名称：' + company_name)
         worksheet.write(start_row, 1, company_name, style)  # 将信息输入表格
         basic_informatiion_array =_response.select("#Cominfo > table > tr")     # 符号">"为上一个标签下的直接子标签
         if len(basic_informatiion_array) > 0:
@@ -66,7 +66,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
                 # if len(basic_informatiion_array[0].select('td')[1].select('h2')) > 0 and ('法定代表人' in legal_person_item or '经营者' in legal_person_item):
                 if len(basic_informatiion_array[0].select('td')[1].select('h2')) > 0:
                     legal_person = basic_informatiion_array[0].select('td')[1].select('h2')[0].text.replace('\n', '').replace(' ', '')
-            logging.info('法人：' + legal_person)
+            print('法人：' + legal_person)
             worksheet.write(start_row, 2, legal_person, style)  # 将信息输入表格
             # 注册资本
             registration_capital = '-'
@@ -74,7 +74,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
                 registration_capital_item = basic_informatiion_array[0].select('td')[2].text.replace('\n', '').replace(' ', '')
                 if '注册资本' in registration_capital_item:
                     registration_capital = basic_informatiion_array[0].select('td')[3].text.replace('\n', '').replace(' ', '')
-            logging.info('注册资本：' + registration_capital)
+            print('注册资本：' + registration_capital)
             worksheet.write(start_row, 3, registration_capital, style)  # 将信息输入表格
             # 实缴资本
             real_capital = '-'
@@ -82,7 +82,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
                 real_capital_item = basic_informatiion_array[1].select('td')[0].text.replace('\n', '').replace(' ', '')
                 if '实缴资本' in real_capital_item:
                     real_capital = basic_informatiion_array[1].select('td')[1].text.replace('\n', '').replace(' ', '')
-            logging.info('实缴资本：' + real_capital)
+            print('实缴资本：' + real_capital)
             worksheet.write(start_row, 4, real_capital, style)  # 将信息输入表格
             # 经营状态
             operating_status = '-'
@@ -90,7 +90,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
                 operating_status_item = basic_informatiion_array[2].select('td')[0].text.replace('\n', '').replace(' ', '')
                 if '经营状态' in operating_status_item:
                     operating_status = basic_informatiion_array[2].select('td')[1].text.replace('\n', '').replace(' ', '')
-            logging.info('经营状态：' + operating_status)
+            print('经营状态：' + operating_status)
             worksheet.write(start_row, 5, operating_status, style)  # 将信息输入表格
             # 成立日期
             establishment_date = '-'
@@ -98,7 +98,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
                 establishment_date_item = basic_informatiion_array[2].select('td')[2].text.replace('\n', '').replace(' ', '')
                 if '成立日期' in establishment_date_item:
                     establishment_date = basic_informatiion_array[2].select('td')[3].text.replace('\n', '').replace(' ', '')
-            logging.info('成立日期：' + establishment_date)
+            print('成立日期：' + establishment_date)
             worksheet.write(start_row, 6, establishment_date, style)  # 将信息输入表格
             # 统一社会信用代码
             unified_credit_code = '-'
@@ -106,7 +106,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
                 unified_credit_code_item = basic_informatiion_array[3].select('td')[0].text.replace('\n', '').replace(' ','')
                 if '统一社会信用代码' in unified_credit_code_item:
                     unified_credit_code = basic_informatiion_array[3].select('td')[1].text.replace('\n', '').replace(' ', '')
-            logging.info('统一社会信用代码：' + unified_credit_code)
+            print('统一社会信用代码：' + unified_credit_code)
             worksheet.write(start_row, 7, unified_credit_code, style)  # 将信息输入表格
             # 纳税人识别号
             taxpayer_identification = '-'
@@ -114,7 +114,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
                 taxpayer_identification_item = basic_informatiion_array[3].select('td')[2].text.replace('\n', '').replace(' ', '')
                 if '纳税人识别号' in taxpayer_identification_item:
                     taxpayer_identification = basic_informatiion_array[3].select('td')[3].text.replace('\n', '').replace(' ', '')
-            logging.info('纳税人识别号：' + taxpayer_identification)
+            print('纳税人识别号：' + taxpayer_identification)
             worksheet.write(start_row, 8, taxpayer_identification, style)  # 将信息输入表格
             # 注册号
             registration_number = '-'
@@ -122,7 +122,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
                 registration_number_item = basic_informatiion_array[4].select('td')[0].text.replace('\n', '').replace(' ', '')
                 if '注册号' in registration_number_item:
                     registration_number = basic_informatiion_array[4].select('td')[1].text.replace('\n', '').replace(' ', '')
-            logging.info('注册号：' + registration_number)
+            print('注册号：' + registration_number)
             worksheet.write(start_row, 9, registration_number, style)  # 将信息输入表格
             # 组织机构代码
             organization_code = '-'
@@ -130,7 +130,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
                 organization_code_item = basic_informatiion_array[4].select('td')[2].text.replace('\n', '').replace(' ', '')
                 if '组织机构代码' in organization_code_item:
                     organization_code = basic_informatiion_array[4].select('td')[3].text.replace('\n', '').replace(' ', '')
-            logging.info('组织机构代码：' + organization_code)
+            print('组织机构代码：' + organization_code)
             worksheet.write(start_row, 10, organization_code, style)  # 将信息输入表格
             # 企业类型
             company_type = '-'
@@ -138,7 +138,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
                 company_type_item = basic_informatiion_array[5].select('td')[0].text.replace('\n', '').replace(' ', '')
                 if '企业类型' in company_type_item:
                     company_type = basic_informatiion_array[5].select('td')[1].text.replace('\n', '').replace(' ', '')
-            logging.info('企业类型：' + company_type)
+            print('企业类型：' + company_type)
             worksheet.write(start_row, 11, company_type, style)  # 将信息输入表格
             # 所属行业
             industry = '-'
@@ -146,7 +146,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
                 industry_item = basic_informatiion_array[5].select('td')[2].text.replace('\n', '').replace(' ', '')
                 if '所属行业' in industry_item:
                     industry = basic_informatiion_array[5].select('td')[3].text.replace('\n', '').replace(' ', '')
-            logging.info('所属行业：' + industry)
+            print('所属行业：' + industry)
             worksheet.write(start_row, 12, industry, style)  # 将信息输入表格
             # 人员规模
             employees = '-'
@@ -154,7 +154,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
                 employees_item = basic_informatiion_array[9].select('td')[0].text.replace('\n', '').replace(' ', '')
                 if '人员规模' in employees_item:
                     employees = basic_informatiion_array[9].select('td')[1].text.replace('\n', '').replace(' ', '')
-            logging.info('人员规模：' + employees)
+            print('人员规模：' + employees)
             worksheet.write(start_row, 13, employees, style)  # 将信息输入表格
             # 营业期限
             business_term = '-'
@@ -162,7 +162,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
                 business_term_item = basic_informatiion_array[9].select('td')[2].text.replace('\n', '').replace(' ', '')
                 if '营业期限' in business_term_item:
                     business_term = basic_informatiion_array[9].select('td')[3].text.replace('\n', '').replace(' ', '')
-            logging.info('营业期限：' + business_term)
+            print('营业期限：' + business_term)
             worksheet.write(start_row, 14, business_term, style)  # 将信息输入表格
             # 企业地址
             adress = '-'
@@ -170,7 +170,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
                 adress_item = basic_informatiion_array[10].select('td')[0].text.replace('\n','').replace(' ', '')
                 if '企业地址' in adress_item:
                     adress = basic_informatiion_array[10].select('td')[1].text.replace('查看地图', '').replace('附近企业', '').replace('\n', '').replace(' ', '')
-            logging.info('企业地址：' + adress)
+            print('企业地址：' + adress)
             worksheet.write(start_row, 15, adress, style)  # 将信息输入表格
             # 经营范围
             business_scope = '-'
@@ -178,7 +178,7 @@ def export_basic_inf(data_list, workbook, is_exsit):
                 business_scope_item = basic_informatiion_array[11].select('td')[0].text.replace('\n', '').replace(' ', '')
                 if '经营范围' in business_scope_item:
                     business_scope = basic_informatiion_array[11].select('td')[1].text.replace('\n', '').replace(' ', '')
-            logging.info('经营范围：' + business_scope)
+            print('经营范围：' + business_scope)
             worksheet.write(start_row, 16, business_scope, style)  # 将信息输入表格
         start_row += 1
 
