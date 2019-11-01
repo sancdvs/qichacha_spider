@@ -16,21 +16,89 @@ import random
 from bs4 import BeautifulSoup
 from lxml import etree
 from selenium import webdriver
+from selenium.webdriver import DesiredCapabilities
 from xlutils.copy import copy
 
 from basic_info import export_basic_inf
 from config import base_url, base_url1, enterprise_search_file, spider_timeout, spider_retry_num, cookie_interval_time, \
     spider_result_file_name, crawl_interval_mintime, crawl_interval_maxtime, chrome_driver, basic_inf_sheet_name, \
-    partners_sheet_name, key_personnel_sheet_name, error_data_sheet_name
+    partners_sheet_name, key_personnel_sheet_name, error_data_sheet_name, phantomjs_driver, log_dir
 from error_data import export_error_data
 from excel_util import check_file, check_sheet_exsit
 from proxy_ip import _proxy, is_internet
-from headers import get_headers, get_proxy_headers, generateCookie, cookies_local
+from headers import get_headers, get_proxy_headers, generateCookie, cookies_local, random_user_agent, getChromeProxyIp, \
+    random_cookie
 from partners import export_partners
 from key_personnel import export_key_personnel
 from tools.myTimer import MyTimer
 from log import logging
 
+'''使用selenium爬取'''
+def selenium_crawl(url,isProxy):
+    # 获取当前文件路径
+    current_path = inspect.getfile(inspect.currentframe())
+    # 获取当前文件所在目录，相当于当前文件的父目录
+    dir_name = os.path.dirname(current_path)
+    # 转换为绝对路径
+    file_abs_path = os.path.abspath(dir_name)
+    '''
+       这边报错Message: invalid cookie domain
+       (Session info: headless chrome=77.0.3865.120)
+       (Driver info: chromedriver=77.0.3865.40 (f484704e052e0b556f8030b65b953dce96503217-refs/branch-heads/3865@{#442}),platform=Windows NT 6.1.7601 SP1 x86_64)
+       是由于Chrome驱动版本与本地浏览器的版本不一致所致，但是现在Chrome驱动还没有与之匹配的版本。
+    '''
+    # chrome_options = webdriver.ChromeOptions()
+    # chrome_options.add_argument('--user-agent='+random_user_agent())
+    # chrome_options.add_argument('--headless')  # 开启无界面模式
+    # chrome_options.add_argument('--disable-gpu')  # 禁用gpu，解决一些莫名的问题
+    # # chrome_options.add_argument('--no-sandbox')
+    # if isProxy:
+    #     # 设置代理
+    #     proxy_ip = _proxy()
+    #     chrome_options.add_argument("--proxy-server="+getChromeProxyIp(proxy_ip))
+    # driver = webdriver.Chrome(executable_path=file_abs_path+chrome_driver, chrome_options=chrome_options)
+    # driver.maximize_window()
+
+    desired_capabilities = DesiredCapabilities.PHANTOMJS.copy()
+    # 从USER_AGENTS列表中随机选一个浏览器头，伪装浏览器
+    desired_capabilities["phantomjs.page.settings.userAgent"] = random_user_agent()
+    # 不载入图片，爬页面速度会快很多
+    desired_capabilities["phantomjs.page.settings.loadImages"] = False
+    driver = webdriver.PhantomJS(executable_path=file_abs_path + phantomjs_driver,
+                                 service_log_path=file_abs_path + log_dir + r'\ghostdriver.log')
+    driver.start_session(desired_capabilities)
+
+    # 隐式等待5秒，可以自己调节
+    driver.implicitly_wait(5)
+    # 设置10秒页面超时返回，类似于requests.get()的timeout选项，driver.get()没有timeout选项
+    # 以前遇到过driver.get(url)一直不返回，但也不报错的问题，这时程序会卡住，设置超时选项能解决这个问题。
+    driver.set_page_load_timeout(spider_timeout)
+    # 设置10秒脚本超时时间
+    driver.set_script_timeout(spider_timeout)
+    driver.get(url)
+    driver.delete_all_cookies()
+    # 添加cookie
+    cookies = get_cookie_dict(random_cookie())
+    for name, value in cookies.items():
+        cookie_dict = {
+            "domain": ".qichacha.com",  # 火狐浏览器不用填写，谷歌要需要
+            'name': name,
+            'value': value,
+            "expires": "",
+            'path': '/',
+            'httpOnly': False,
+            'HostOnly': False,
+            'Secure': False}
+        driver.add_cookie(cookie_dict=cookie_dict)
+    # print(driver.page_source)
+    return driver.page_source
+
+def get_cookie_dict(cookie):
+    cookie_dict = {}
+    cookie_array = cookie.split('; ')
+    for cook in cookie_array:
+        cookie_dict[cook.split('=')[0]] = cook.split('=')[1]
+    return cookie_dict
 
 def export_excel(data, error_data):
     if check_file(spider_result_file_name):
@@ -100,8 +168,9 @@ def verify(url):
 # 爬取目标页面重试
 def retry_crawl(url, isProxy):
     response = None
+    logging.error('抓取异常！正在试图重新抓取页面{}'.format(url))
     for i in range(spider_retry_num):
-        print('抓取异常！正在试图第{}次抓取页面{}'.format(i + 1, url))
+        logging.error('重新抓取第{}次'.format(i + 1))
         try:
             if isProxy:
                 proxy = _proxy()
@@ -127,8 +196,9 @@ def retry_crawl(url, isProxy):
         #     print('由于操作频繁被企查查识别为爬虫，请手动点击此链接验证：{}'.format(verify_url))
         #     # verify(verify_url)
         #     time.sleep(20)
-        # else:
-        #     print(response.text.encode('utf-8'))
+        else:
+            logging.error('=================返回异常=================')
+            logging.error(response.text)
         time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))
     return response
 
@@ -261,24 +331,24 @@ if __name__ == '__main__':
 
                     time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))  # 间隔一段时间
 
-                    if is_proxy:
-                        proxy = _proxy()
-                        print('正在使用代理{}，抓取页面 {}'.format(proxy, url))
-                        try:
-                            response1 = requests.get(url, headers=get_proxy_headers(proxy), proxies=proxy, timeout=spider_timeout)
-                        except Exception as e:
-                            response1 = retry_crawl(url, is_proxy)
-                    else:
-                        try:
-                            response1 = requests.get(url, headers=get_headers(), timeout=spider_timeout)
-                        except Exception as e:
-                            response1 = retry_crawl(url, is_proxy)
-                    # if response1.status_code != 200:
-                    #     print("抓取页面 {}，异常 {} 可能被企查查网站反爬拦截了！".format(url, response1.status_code))
-                    #     error_data_list.append(name)
-                    #     continue
-                    _response1 = response1.text
-                    _soup = BeautifulSoup(_response1, 'lxml')
+                    # if is_proxy:
+                    #     proxy = _proxy()
+                    #     print('正在使用代理{}，抓取页面 {}'.format(proxy, url))
+                    #     try:
+                    #         response1 = requests.get(url, headers=get_proxy_headers(proxy), proxies=proxy, timeout=spider_timeout)
+                    #     except Exception as e:
+                    #         response1 = retry_crawl(url, is_proxy)
+                    # else:
+                    #     try:
+                    #         response1 = requests.get(url, headers=get_headers(), timeout=spider_timeout)
+                    #     except Exception as e:
+                    #         response1 = retry_crawl(url, is_proxy)
+                    # _response1 = response1.text
+                    # 此处使用selenium爬取页面，解决页面返回没有数据的问题
+                    _response1 = selenium_crawl(url, is_proxy)
+                    if _response1 is not None:
+                        _soup = BeautifulSoup(_response1, 'lxml')
+                    # print(_soup)
                     data_list.append(_soup)
                     print("{}=============抓取成功！".format(name))
                 except Exception as e:
