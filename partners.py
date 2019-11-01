@@ -38,10 +38,12 @@ def export_partners(data_list,workbook, is_exsit):
     for _response in data_list:
         order_number += 1
         # 公司名称
-        company_name = _response.find(class_="row title jk-tip").select('h1')[0].text.replace('\n', '').replace(' ', '')
+        company_name = _response.find(class_="content")
+        if company_name is not None:
+            company_name = company_name.select('h1')[0].text.replace('\n', '').replace(' ', '') if len(company_name.select('h1')) > 0 else '无'
         print('公司名称：' + company_name)
 
-        partner_array = _response.select("#partnerslist > table > tr")
+        partner_array = _response.select("#partnerslist > table > tbody > tr")
         if len(partner_array) == 0:
             if len(_response.select("#partnerslist > div")) > 1 and len(_response.select("#partnerslist > div")[1].select('table')) > 0:
                 partner_array =_response.select("#partnerslist > div")[1].select('table')[0].select('tbody > tr')
@@ -60,30 +62,35 @@ def export_partners(data_list,workbook, is_exsit):
             worksheet.write(start_row, 7, '--', style)
             start_row += 1
 
+        if len(partner_array) == 0:
+            logging.error('未找到该公司股东信息============{}'.format(company_name))
+
         if len(partner_array) > 0:
             partner_th = [data for data in partner_array[0].children if data != ' '][1:]  # 股东表格的标题行th,去除序号th
             partner_tbale_th = [th.text.replace('\n', '').replace(' ', '') for th in partner_th]
             # print('表格标题行=========={}'.format(partner_tbale_th))
 
-        for i in range(1, len(partner_array)):
-            partner_row = [data for data in partner_array[i].children if data != ' '][1:]   # 数据行，排除序号列td
-            for j in range(len(partner_row)):
-                # 去除th标题中的单位，否则自定义的partner_title中查询不到。列如：认缴出资额(万元)--》认缴出资额。
-                title = partner_tbale_th[j].split('(')[0] if '(' in partner_tbale_th[j] else partner_tbale_th[j]
-                unit = (partner_tbale_th[j].split('(')[1] if '(' in partner_tbale_th[j] else '').replace(')', '')
-                # 查出股东表格的标题行在自定义的partner_title中的索引位置，为写入excel的列索引。
-                index = [k for k,x in enumerate(partner_title) if title in x]
-                if len(index) > 0:
-                    v = partner_row[j].text.replace('\n', '').replace(' ', '').replace('持股详情>', '')
-                    if '-' != v:
-                        v += unit
-                    print(partner_title[index[0]]+'：'+v)
-                    worksheet.write(start_row, index[0], v, style)  # 将信息输入表格
-                elif len(partner_row[j].select('h3')) > 0:
-                    partner_name = partner_row[j].select('h3')[0].text.replace('\n', '').replace(' ', '')
-                    print('股东名称：' + partner_name)
-                    worksheet.write(start_row, 2, partner_name, style)  # 将信息输入表格
-            start_row += 1
+        if len(partner_array) > 1:
+            for i in range(1, len(partner_array)):
+                partner_row = [data for data in partner_array[i].children if data != ' '][1:]   # 数据行，排除序号列td
+                for j in range(len(partner_row)):
+                    # 去除th标题中的单位，否则自定义的partner_title中查询不到。列如：认缴出资额(万元)--》认缴出资额。
+                    title = partner_tbale_th[j].split('(')[0] if '(' in partner_tbale_th[j] else partner_tbale_th[j]
+                    unit = (partner_tbale_th[j].split('(')[1] if '(' in partner_tbale_th[j] else '').replace(')', '')
+                    # 查出股东表格的标题行在自定义的partner_title中的索引位置，为写入excel的列索引。
+                    index = [k for k,x in enumerate(partner_title) if title in x]
+                    if len(index) > 0:
+                        v = partner_row[j].text.replace('\n', '').replace(' ', '').replace('持股详情>', '')
+                        if '-' != v:
+                            v += unit
+                        print(partner_title[index[0]]+'：'+v)
+                        worksheet.write(start_row, index[0], v, style)  # 将信息输入表格
+                    elif len(partner_row[j].select('h3')) > 0:
+                        partner_name = partner_row[j].select('h3')[0].text.replace('\n', '').replace(' ', '')
+                        print('股东名称：' + partner_name)
+                        worksheet.write(start_row, 2, partner_name, style)  # 将信息输入表格
+                start_row += 1
+
             # #股东及出资信息
             # partner_name = '-'
             # if len(partner_array[i].select('td')) > 1 and len(partner_array[i].select('td')[1].select('h3')) > 0:

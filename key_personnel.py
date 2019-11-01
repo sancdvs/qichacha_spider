@@ -28,9 +28,11 @@ def export_key_personnel(data_list, workbook, is_exsit):
     for _response in data_list:
         order_number += 1
         # 公司名称
-        company_name = _response.find(class_="row title jk-tip").select('h1')[0].text.replace('\n', '').replace(' ', '')
+        company_name = _response.find(class_="content")
+        if company_name is not None:
+            company_name = company_name.select('h1')[0].text.replace('\n', '').replace(' ', '') if len(company_name.select('h1')) > 0 else '无'
         print('公司名称：' + company_name)
-        personnel_array = _response.select("#Mainmember > table > tr")  # 包含了标题tr
+        personnel_array = _response.select("#Mainmember > table > tbody > tr")  # 包含了标题tr
         # print(personnel_array)
         if len(personnel_array)-1 > 0:
             worksheet.write_merge(start_row, start_row + len(personnel_array)-2, 0, 0, order_number, style_merge)  # 合并序号单元格
@@ -41,7 +43,11 @@ def export_key_personnel(data_list, workbook, is_exsit):
             worksheet.write(start_row, 2, '--', style)
             worksheet.write(start_row, 3, '--', style)
             start_row += 1
-        if len(personnel_array) >1:
+
+        if len(personnel_array) == 0:
+            logging.error('未找到该公司主要人员============{}'.format(company_name))
+
+        if len(personnel_array) > 1:
             for i in range(1, len(personnel_array)):
                 # 姓名
                 if len(personnel_array[i].select('td')) > 1 and len(personnel_array[i].select('td')[1].select('h3')) > 0:
