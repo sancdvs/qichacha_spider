@@ -198,7 +198,7 @@ def retry_crawl(url, isProxy):
         #     time.sleep(20)
         else:
             logging.error('=================返回异常=================')
-            logging.error(response.text)
+            # logging.error(response.text)
         time.sleep(random.randint(crawl_interval_mintime, crawl_interval_maxtime))
     return response
 
