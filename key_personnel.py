@@ -54,7 +54,7 @@ def export_key_personnel(data_list, workbook, is_exsit):
                     name = personnel_array[i].select('td')[1].select('h3')[0].text.replace('\n', '').replace(' ', '')
                 print('姓名：' + name)
                 worksheet.write(start_row, 2, name, style)  # 将信息输入表格
-                # 职务
+                                  # 职务
                 if len(personnel_array[i].select('td')) > 2:
                     job = personnel_array[i].select('td')[2].text.replace('\n', '').replace(' ', '')
                 print('职务：' + job)

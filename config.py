@@ -6,7 +6,7 @@ base_url = 'https://www.qichacha.com/search?key='
 # 爬取目标页面超时时间
 spider_timeout = 30
 # 爬取目标页面重试次数
-spider_retry_num = 2
+spider_retry_num = 1
 # 爬取页面的间隔最小时间（秒）,防止被反爬
 crawl_interval_mintime = 5
 # 爬取页面的间隔最大时间（秒）,防止被反爬
