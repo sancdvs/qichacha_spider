@@ -81,7 +81,7 @@ def selenium_crawl(url,isProxy):
     cookies = get_cookie_dict(random_cookie())
     for name, value in cookies.items():
         cookie_dict = {
-            "domain": ".qichacha.com",  # 火狐浏览器不用填写，谷歌要需要
+            "domain": ".qcc.com",  # 火狐浏览器不用填写，谷歌要需要
             'name': name,
             'value': value,
             "expires": "",
@@ -146,7 +146,7 @@ def export_excel(data, error_data):
 
 
 def verify(url):
-    # url1 = 'https://www.qichacha.com/index_verify?type=companysearch&back=/search?key=%E5%90%88%E8%82%A5%E6%99%AF%E5%96%9C%E7%94%B5%E6%B0%94%E8%AE%BE%E5%A4%87%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8'
+    # url1 = 'https://www.qcc.com/index_verify?type=companysearch&back=/search?key=%E5%90%88%E8%82%A5%E6%99%AF%E5%96%9C%E7%94%B5%E6%B0%94%E8%AE%BE%E5%A4%87%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8'
     # 创建一个参数对象,用来控制chrome以无界面打开
     # 获取当前文件路径
     current_path = inspect.getfile(inspect.currentframe())
