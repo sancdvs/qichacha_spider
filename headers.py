@@ -73,7 +73,7 @@ def random_cookie():
 
 def get_headers():
     return {
-        'Host': "www.qichacha.com",
+        'Host': "www.qcc.com",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Encoding": "gzip, deflate",
         "Accept-Language": "en-US,en;q=0.5",
@@ -87,7 +87,7 @@ def get_headers():
 def get_proxy_headers(proxy_ip):
     userAgent = random_user_agent()
     return {
-        'Host': "www.qichacha.com",
+        'Host': "www.qcc.com",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Encoding": "gzip, deflate",
         "Accept-Language": "en-US,en;q=0.5",
@@ -198,7 +198,7 @@ def generateCookie():
 def generateProxyCookie(userAgent,proxy_ip):
     cookie = None
     headers = {
-        'Host': "www.qichacha.com",
+        'Host': "www.qcc.com",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Encoding": "gzip, deflate",
         "Accept-Language": "en-US,en;q=0.5",
@@ -283,7 +283,7 @@ def generateProxyCookie(userAgent,proxy_ip):
 # 使用代理生成cookie
 # 目前这个报错：selenium.common.exceptions.WebDriverException: Message: Can not connect to GhostDriver on port
 def generateProxyCookie2(proxy_ip):
-    # url = 'http://m.qichacha.com/user_login'
+    # url = 'http://m.qcc.com/user_login'
     desired_capabilities = DesiredCapabilities.PHANTOMJS.copy()
     # desired_capabilities = dict(DesiredCapabilities.PHANTOMJS)
     # 从USER_AGENTS列表中随机选一个浏览器头，伪装浏览器
@@ -344,7 +344,7 @@ def getWebdriverProxy(proxy_ip):
 
 
 def getCookie():
-    url = 'http://m.qichacha.com/user_login'
+    url = 'http://m.qcc.com/user_login'
     Hostreferer = {
         #'Host':'***',
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36'
@@ -367,7 +367,7 @@ def getCookie2():
     # 通过CookieHandler创建opener
     opener = request.build_opener(handler)
     # 此处的open方法打开网页
-    url = 'http://m.qichacha.com/user_login'
+    url = 'http://m.qcc.com/user_login'
     response = opener.open(url)
     # 打印cookie信息
     for item in cookie:
@@ -396,8 +396,8 @@ if __name__ == '__main__':
     # print(ua.random)
     num = 0
     for i in range(100):
-        url = 'https://www.qichacha.com/user_login'
-        start_url = 'https://www.qichacha.com/search?key=安徽宝光特钢集团万里电力铁塔有限公司'
+        url = 'https://www.qcc.com/user_login'
+        start_url = 'https://www.qcc.com/search?key=安徽宝光特钢集团万里电力铁塔有限公司'
         proxy_ip = _proxy()
         uag = ua.random
         print(proxy_ip)
@@ -429,7 +429,7 @@ if __name__ == '__main__':
         #     continue
         cookie =  'UM_distinctid=16d4d781a883e4-0d488cc5eb0bd7-3c375c0f-1fa400-16d4d781a897c2; _uab_collina=156896278000246547487356; zg_did=%7B%22did%22%3A%20%2216d4d781c73a19-0fb78f64911642-3c375c0f-1fa400-16d4d781c74a96%22%7D; QCCSESSID=j5ijbf92h5mo8glg79m7n7ic13; gr_user_id=6ddfcc96-975d-4ca2-ac40-fc47c0c9cd47; acw_tc=3a31f83315716463151091796e73ee968b6b3f8a14938cf72882369393; Hm_lvt_3456bee468c83cc63fb5147f119f1075=1571726572,1571792600,1571887051,1571966887; hasShow=1; CNZZDATA1254842228=747979137-1568960098-https%253A%252F%252Fsp0.baidu.com%252F%7C1571984517; zg_de1d1a35bfa24ce29bbf2c7eb17e6c4f=%7B%22sid%22%3A%201571985618272%2C%22updated%22%3A%201571986638288%2C%22info%22%3A%201571792600028%2C%22superProperty%22%3A%20%22%7B%7D%22%2C%22platform%22%3A%20%22%7B%7D%22%2C%22utm%22%3A%20%22%7B%7D%22%2C%22referrerDomain%22%3A%20%22www.qichacha.com%22%2C%22zs%22%3A%200%2C%22sc%22%3A%200%2C%22cuid%22%3A%20%22fb8fdce6a05a5ebaaa6b99d2706f091c%22%7D; Hm_lpvt_3456bee468c83cc63fb5147f119f1075=1571986638'
         headers = {
-            'Host': "www.qichacha.com",  # 需要修改
+            'Host': "www.qcc.com",  # 需要修改
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Encoding": "gzip, deflate",
             "Accept-Language": "en-US,en;q=0.5",
